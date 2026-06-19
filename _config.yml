@@ -1,22 +1,21 @@
 ###########################################################
-### Welcome to Beautiful Jekyll!
-### This config file is meant for settings that affect your entire website. When you first
-### set up your website you should go through all these settings and edit them, but after
-### the initial set up you won't need to come back to this file often.
+### 欢迎使用 Beautiful Jekyll！
+### 此配置文件用于设置整个网站的通用选项。初次搭建网站时，
+### 请仔细阅读并编辑以下所有选项，之后通常无需再次修改。
 ###########################################################
 
 ############################
-# --- Required options --- #
+# --- 必须配置的选项 --- #
 ############################
 
-# Name of website
+# 网站名称（显示在标题和导航栏）
 title: My website
 
-# Your name to show in the footer
+# 您的姓名（显示在页脚）
 author: Some Person
 
 ###############################################
-# --- List of links in the navigation bar --- #
+# --- 导航栏链接列表 --- #
 ###############################################
 
 navbar-links:
@@ -27,31 +26,30 @@ navbar-links:
   Author's home: "https://deanattali.com"
 
 ################
-# --- Logo --- #
+# --- 网站标志 (Logo) --- #
 ################
 
-# Image to show in the navigation bar - works best with a square image
-# Remove this parameter if you don't want an image in the navbar
+# 导航栏中显示的图片，建议使用正方形图片
+# 如果不想在导航栏显示图片，请删除此参数
 avatar: "/assets/img/avatar-icon.png"
 
-# By default, the image is cut into a circle. You can disable this behaviour by setting 'round-avatar: false'
+# 默认会将图片裁剪为圆形，若想禁用此行为，请将下面的值设为 false
 round-avatar: true
 
-# If you want to have an image logo in the top-left corner instead of having the title of the website,
-# then specify the following parameter
+# 如果想在左上角使用图片 Logo 代替网站标题，请指定以下参数
 #title-img: /path/to/image
 
 
 #####################################
-# --- Footer social media links --- #
+# --- 页脚社交网络链接 --- #
 #####################################
 
-# Select the social network links that you want to show in the footer.
-# You can change the order that they show up on the page by changing the order here.
-# Uncomment the links you want to show and add your information to each one.
+# 选择要在页脚显示的社交网络链接。
+# 您可以调整顺序以改变显示顺序。
+# 取消注释您想显示的链接，并填入您的信息。
 social-network-links:
   email: "someone@example.com"
-  rss: true  # remove this line if you don't want to show an RSS link at the bottom
+  rss: true  # 如果不想显示 RSS 链接，请删除此行
   facebook: deanattali
   github: daattali
   twitter: daattali
@@ -84,15 +82,15 @@ social-network-links:
 #  untappd: yourname
 #  strava: youruserid
 
-# If you want your website to generate an RSS feed, provide a description
-# The URL for the feed will be https://<your_website>/feed.xml
+# 如果希望网站生成 RSS 订阅源，请提供一段描述
+# 订阅源的 URL 为 https://<您的网站>/feed.xml
 rss-description: This website is a virtual proof that I'm awesome
 
 ###########################
-# --- General options --- #
+# --- 通用选项 --- #
 ###########################
 
-# Select which social network share links to show in posts
+# 选择在文章中显示哪些社交网络分享按钮
 share-links-active:
   twitter: true
   facebook: true
@@ -100,41 +98,40 @@ share-links-active:
   vk: false
   reddit: false
 
-# How to display the link to your website in the footer
-# Remove this if you don't want a link in the footer
+# 页脚中显示网站链接的方式（去掉则不在页脚显示链接）
 url-pretty: "MyWebsite.com"
 
-# Add the website title to the title of every page
+# 是否在每个页面的标题中都加上网站标题
 title-on-all-pages: true
 
-# Excerpt word length - Truncate the excerpt of each post on the feed page to the specified number of words
+# 摘要长度 - 在 feed 页面上将每篇文章的摘要截断为指定字数
 excerpt_length: 50
 
-# Whether or not to show an excerpt for every blog post in the feed page
+# 是否在 feed 页面的每篇博客预览下方显示摘要
 feed_show_excerpt: true
 
-# Whether or not to show a list of tags below each post preview in the feed page
+# 是否在 feed 页面的每篇博客预览下方显示标签列表
 feed_show_tags: true
 
-# Add a search button to the navbar
+# 在导航栏中添加搜索按钮
 post_search: true
 
-# Add a button in the footer to edit the current page. Only works if your website is hosted on GitHub
+# 在页脚添加“编辑当前页面”按钮（仅当网站托管在 GitHub 上时有效）
 edit_page_button: true
 
-# Allow sub-menu items (second-level navigation menu items) to be longer than the top-level menu
-# If this setting is off, then long sub-menu words might get cut off
-# See https://github.com/daattali/beautiful-jekyll/issues/765 to understand the issue this setting can solve
+# 允许子菜单项（二级导航菜单）比一级菜单更长
+# 如果关闭此设置，较长的子菜单单词可能会被截断
+# 有关此设置解决的问题，请参见 https://github.com/daattali/beautiful-jekyll/issues/765
 navbar-var-length: false
 
-# The keywords to associate with your website, for SEO purposes
+# 用于 SEO 的网站关键词
 #keywords: "my,list,of,keywords"
 
 ######################################
-# --- Colours / background image --- #
+# --- 颜色 / 背景图片 --- #
 ######################################
 
-# Personalize the colours in your website. Colour values can be any valid CSS colour
+# 自定义网站颜色。颜色值可以是任何有效的 CSS 颜色值。
 
 page-col: "#FFFFFF"
 text-col: "#404040"
@@ -148,118 +145,112 @@ footer-text-col: "#777777"
 footer-link-col: "#404040"
 footer-hover-col: "#0085A1"
 
-# Alternatively, the navbar, footer, and page background can be set to an image
-# instead of colour
-
+# 也可以使用图片替代颜色作为导航栏、页脚和页面背景
 #navbar-img: "/assets/img/bgimage.png"
 #footer-img: "/assets/img/bgimage.png"
 #page-img: "/assets/img/bgimage.png"
 
-# Suggest a colour for mobile browsers to use as the browser's theme. This is only supported by a few mobile browsers.
+# 为移动浏览器建议一种颜色作为浏览器主题色（仅少数移动浏览器支持）
 #mobile-theme-col: "#0085A1"
 
-# For any extra visual customization, you can include additional CSS files in every page on your site. List any custom CSS files here
+# 如需额外的视觉定制，可以在每个页面中添加额外的 CSS 文件。在此列出您的自定义 CSS 文件
 #site-css:
 #  - "/assets/css/custom-styles.css"
 
-# If you have common JavaScript files that should be included in every page, list them here
+# 如果有通用的 JavaScript 文件需要在每个页面中引入，请在此列出
 #site-js:
 #  - "/assets/js/custom-script.js"
 
 #################################
-# --- Web Analytics Section --- #
+# --- 网站分析统计 --- #
 #################################
 
-# Fill in your Google Analytics tag ID (or "Measurement ID") to track your website usage
+# 填入您的 Google Analytics 跟踪 ID（或“Measurement ID”）以跟踪网站使用情况
 #gtag: "G-XXXXXXXXXX"
 
-# Fill in your Cloudflare Analytics beacon token to track your website using Cloudflare Analytics
+# 填入您的 Cloudflare Analytics 令牌以使用 Cloudflare 分析
 #cloudflare_analytics: ""
 
 # Google Tag Manager ID
 #gtm: ""
 
-# Matomo (aka Piwik) Web statistics
-# Uncomment the following section to enable Matomo. The opt-out parameter controls
-# whether or not you want to allow users to opt out of tracking.
+# Matomo（即 Piwik）网站统计
+# 取消注释以下部分以启用 Matomo。opt-out 参数控制是否允许用户选择退出跟踪。
 #matomo:
 #  site_id: "9"
 #  uri: "demo.wiki.pro"
 #  opt-out: true
 
-# Google Universal Analytics ID -- deprecated
-# As of July 2023 this is no longer supported by Google! If you are still using `google_analytics`,
-# you should switch to using the `gtag` field above instead.
+# Google Universal Analytics ID -- 已弃用
+# 自 2023 年 7 月起，Google 不再支持此方式！如果您仍在使用 `google_analytics`，
+# 应改用上面的 `gtag` 字段。
 #google_analytics: "UA-XXXXXXXX-X"
 
 ####################
-# --- Comments --- #
+# --- 评论系统 --- #
 ####################
 
-# To use Disqus comments, sign up to https://disqus.com and fill in your Disqus shortname (NOT the userid)
+# 使用 Disqus 评论，请前往 https://disqus.com 注册并填写您的 Disqus shortname（不是用户 ID）
 #disqus: ""
 
-# To use Facebook Comments, create a Facebook app and fill in the Facebook App ID
+# 使用 Facebook 评论，请创建 Facebook 应用并填写 Facebook App ID
 #fb_comment_id: ""
 
-# To use CommentBox, sign up for a Project ID on https://commentbox.io
-#commentbox: "" # Project ID, e.g. "5694267682979840-proj"
+# 使用 CommentBox，请在 https://commentbox.io 注册项目 ID
+#commentbox: "" # 项目 ID，例如 "5694267682979840-proj"
 
-# To use Utterances comments: (0) uncomment the following section, (1) fill in
-# "repository" (make sure the repository is public), (2) Enable Issues in your repository,
-# (3) Install the Utterances app in your repository https://github.com/apps/utterances
-# See more details about the parameters below at https://utteranc.es/
+# 使用 Utterances 评论：（0）取消注释以下部分，（1）填写 "repository"（确保仓库公开），
+# （2）在您的仓库中启用 Issues，（3）在仓库中安装 Utterances 应用 https://github.com/apps/utterances
+# 有关以下参数的更多详情，请访问 https://utteranc.es/
 #utterances:
-#  repository: # GitHub username/repository eg. "daattali/beautiful-jekyll"
-#  issue-term: title   # Mapping between blog posts and GitHub issues
-#  theme: github-light # Utterances theme
-#  label: blog-comments # Label that will be assigned to GitHub Issues created by Utterances
+#  repository: # GitHub 用户名/仓库名，例如 "daattali/beautiful-jekyll"
+#  issue-term: title   # 博客文章与 GitHub Issue 的映射方式
+#  theme: github-light # Utterances 主题
+#  label: blog-comments # 由 Utterances 创建的 GitHub Issue 所分配的标签
 
-# To use Staticman comments, uncomment the following section. You may leave the reCaptcha
-# section commented if you aren't using reCaptcha for spam protection.
-# Using Staticman requires advanced knowledge, please consult
-# https://github.com/eduardoboucas/staticman/ and https://staticman.net/ for further
-# instructions. For any support with staticman please direct questions to staticman and
-# not to BeautifulJekyll.
+# 使用 Staticman 评论，请取消注释以下部分。如果您不使用 reCaptcha 进行垃圾防护，可保留注释。
+# 使用 Staticman 需要较高的技术知识，请参考
+# https://github.com/eduardoboucas/staticman/ 和 https://staticman.net/ 进一步了解。
+# 任何关于 staticman 的支持问题，请直接咨询 staticman 团队，而非 BeautifulJekyll。
 #staticman:
-#  repository : # GitHub username/repository eg. "daattali/beautiful-jekyll"
-#  branch     : master # If you're not using `master` branch, then you also need to update the `branch` parameter in `staticman.yml`
-#  endpoint   : # URL of your deployment, with a trailing slash eg. "https://<your-api>/v3/entry/github/"
-#  reCaptcha:   # (optional, set these parameters in `staticman.yml` as well)
-#    siteKey  : # You need to apply for a site key on Google
-#    secret   : # Encrypt your password by going to https://<your-own-api>/v3/encrypt/<your-site-secret>
+#  repository : # GitHub 用户名/仓库名，例如 "daattali/beautiful-jekyll"
+#  branch     : master # 如果您不使用 `master` 分支，则还需更新 `staticman.yml` 中的 `branch` 参数
+#  endpoint   : # 您的部署 API 地址，末尾带斜杠，例如 "https://<your-api>/v3/entry/github/"
+#  reCaptcha:   # （可选）以下参数也需在 `staticman.yml` 中设置
+#    siteKey  : # 您需要在 Google 申请 site key
+#    secret   : # 通过访问 https://<your-own-api>/v3/encrypt/<your-site-secret> 加密您的密码
 
-# To use giscus comments:
-# (0) Uncomment the following giscus section, (1) Enable Discussions in your GitHub repository,
-# (2) Install the giscus app in your repository (details at https://giscus.app),
-# (3) Fill in *all* the parameters below
-# See more details about giscus and each of the following parameters at https://giscus.app
+# 使用 giscus 评论：
+# （0）取消注释以下 giscus 部分，（1）在您的 GitHub 仓库中启用 Discussions，
+# （2）在仓库中安装 giscus 应用（详情见 https://giscus.app），
+# （3）填写下面 *全部* 参数
+# 有关 giscus 及各参数的更多信息，请访问 https://giscus.app
 #giscus:
-#  hostname: giscus.app # Replace with your giscus instance's hostname if self-hosting
-#  repository: # GitHub username/repository eg. "daattali/beautiful-jekyll"
-#  repository-id: # ID of your repository, retrieve this info from https://giscus.app
-#  category: Announcements # Category name of your GitHub Discussion posts
-#  category-id: # ID of your category, retrieve this info from https://giscus.app
+#  hostname: giscus.app # 如果自行托管，请替换为您的 giscus 实例主机名
+#  repository: # GitHub 用户名/仓库名，例如 "daattali/beautiful-jekyll"
+#  repository-id: # 您的仓库 ID，从 https://giscus.app 获取
+#  category: Announcements # GitHub Discussion 帖子的分类名称
+#  category-id: # 您的分类 ID，从 https://giscus.app 获取
 #  mapping: pathname
 #  reactions-enabled: 1
 #  emit-metadata: 0
 #  theme: light
 
 ################
-# --- Misc --- #
+# --- 其他 --- #
 ################
 
-# Ruby Date Format to show dates of posts
+# 文章日期的 Ruby 日期格式
 date_format: "%B %-d, %Y"
 
 # Facebook App ID
 #fb_app_id: ""
 
 #################################################################################
-# --- You don't need to touch anything below here (but you can if you want) --- #
+# --- 以下内容通常无需修改（但您也可以按需调整） --- #
 #################################################################################
 
-# Output options (more information on Jekyll's site)
+# 输出选项（更多信息请查阅 Jekyll 官方文档）
 timezone: "America/Toronto"
 markdown: kramdown
 highlighter: rouge
@@ -269,7 +260,7 @@ paginate: 5
 kramdown:
   input: GFM
 
-# Default YAML values (more information on Jekyll's site)
+# 默认 YAML 值（更多信息请查阅 Jekyll 官方文档）
 defaults:
   -
     scope:
@@ -277,15 +268,15 @@ defaults:
       type: "posts"
     values:
       layout: "post"
-      comments: true  # add comments to all blog posts
-      social-share: true # add social media sharing buttons to all blog posts
+      comments: true  # 所有博客文章启用评论
+      social-share: true # 所有博客文章启用社交分享按钮
   -
     scope:
-      path: "" # any file that's not a post will be a "page" layout by default
+      path: "" # 非文章的文件默认使用 "page" 布局
     values:
       layout: "page"
 
-# Exclude these files from production site
+# 生成生产站点时排除的文件
 exclude:
   - CHANGELOG.md
   - CNAME
@@ -302,4 +293,3 @@ plugins:
 
 # Beautiful Jekyll / Dean Attali
 # 2fc73a3a967e97599c9763d05e564189
-
