@@ -1,59 +1,51 @@
-# Name of the property. You can have multiple properties with completely
-# different config blocks for different sections of your site.
-# For example, you can have one property to handle comment submission and
-# another one to handle posts.
-# To encrypt strings use the following endpoint:
-# https://{STATICMAN API INSTANCE}/v3/encrypt/{TEXT TO BE ENCRYPTED}
-# {STATICMAN API INSTANCE} should match the `endpoint` in the theme config
-# file.
+# 属性名称。您可以在网站的不同部分使用多个具有完全不同配置块的属性。
+# 例如，您可以一个属性用于处理评论提交，另一个用于处理文章。
+# 加密字符串请使用以下端点：
+# https://{STATICMAN API INSTANCE}/v3/encrypt/{要加密的文本}
+# {STATICMAN API INSTANCE} 应与主题配置文件中的 `endpoint` 相匹配。
 
 comments:
-  # (*) REQUIRED
+  # (*) 必填
   #
-  # Names of the fields the form is allowed to submit. If a field that is
-  # not here is part of the request, an error will be thrown.
+  # 表单允许提交的字段名称列表。如果请求中包含此处未列出的字段，将抛出错误。
   allowedFields: ["name", "email", "url", "message"]
 
-  # (*) REQUIRED WHEN USING NOTIFICATIONS
+  # (*) 使用通知功能时必填
   #
-  # When allowedOrigins is defined, only requests sent from one of the domains
-  # listed will be accepted. The origin is sent as part as the `options` object
-  # (e.g. <input name="options[origin]" value="https://yourdomain.com/post1")
+  # 当定义了 allowedOrigins 时，只接受来自所列域名之一的请求。
+  # 来源作为 `options` 对象的一部分发送（例如 <input name="options[origin]" value="https://yourdomain.com/post1"）
   # allowedOrigins: ["https://example.com"]
 
-  # (*) REQUIRED
+  # (*) 必填
   #
-  # Name of the branch being used. Must match the `branch` in the theme config
-  # file.
-  branch: "master"   #  use "master" for user page or "gh-pages" for project pages
+  # 所使用的分支名称。必须与主题配置文件中的 `branch` 一致。
+  branch: "master"   #  用户页面使用 "master"，项目页面使用 "gh-pages"
 
-  commitMessage: "New comment by {fields.name}"
+  commitMessage: "来自 {fields.name} 的新评论"
 
-  # (*) REQUIRED
+  # (*) 必填
   #
-  # Destination path (filename) for the data files. Accepts placeholders.
+  # 数据文件的目标路径（文件名）。支持占位符。
   filename: "comment-{@timestamp}"
 
-  # The format of the generated data files. Accepted values are "json", "yaml"
-  # or "frontmatter"
+  # 生成的数据文件格式。可选值为 "json"、"yaml" 或 "frontmatter"
   format: "yaml"
 
-  # List of fields to be populated automatically by Staticman and included in
-  # the data file. Keys are the name of the field. The value can be an object
-  # with a `type` property, which configures the generated field, or any value
-  # to be used directly (e.g. a string, number or array)
+  # 由 Staticman 自动填充并包含在数据文件中的字段列表。
+  # 键为字段名。值可以是一个带有 `type` 属性的对象（用于配置生成的字段），
+  # 也可以是直接使用的任何值（如字符串、数字或数组）。
   generatedFields:
     date:
       type: "date"
       options:
-        format: "iso8601" # "iso8601" (default), "timestamp-seconds", "timestamp-milliseconds"
+        format: "iso8601" # "iso8601"（默认）、"timestamp-seconds"、"timestamp-milliseconds"
 
-  # Whether entries need to be approved before they are published to the main
-  # branch. If set to `true`, a pull request will be created for your approval.
-  # Otherwise, entries will be published to the main branch automatically.
+  # 是否需要在评论发布到主分支前进行审批。
+  # 如果设为 `true`，将创建一个拉取请求供您审批。
+  # 否则，评论将自动发布到主分支。
   moderation: false
 
-  # Akismet spam detection.
+  # Akismet 垃圾评论检测。
   # akismet:
   #   enabled: true
   #   author: "name"
@@ -62,49 +54,46 @@ comments:
   #   content: "message"
   #   type: "comment"
 
-  # Name of the site. Used in notification emails.
-  # name: "Your Site"
+  # 网站名称。用于通知邮件中。
+  # name: "您的网站"
 
-  # Notification settings. When enabled, users can choose to receive notifications
-  # via email when someone adds a reply or a new comment. This requires an account
-  # with Mailgun, which you can get for free at https://mailgun.com.
+  # 通知设置。启用后，当有人回复或发表新评论时，用户可以选择通过电子邮件接收通知。
+  # 这需要拥有 Mailgun 账户，您可以在 https://mailgun.com 免费获取。
   # notifications:
-    # Enable notifications
+    # 启用通知
     # enabled: true
 
-    # (!) ENCRYPTED
+    # (!) 加密
     #
-    # Mailgun API key
+    # Mailgun API 密钥
     # apiKey: ""
 
-    # (!) ENCRYPTED
+    # (!) 加密
     #
-    # Mailgun domain (encrypted)
+    # Mailgun 域名（加密）
     # domain: ""
 
-  # (*) REQUIRED
+  # (*) 必填
   #
-  # Destination path (directory) for the data files. Accepts placeholders.
-  path: "_data/comments/{options.slug}" # (default)
+  # 数据文件的目标路径（目录）。支持占位符。
+  path: "_data/comments/{options.slug}" # （默认）
 
-  # Names of required files. If any of these isn't in the request or is empty,
-  # an error will be thrown.
+  # 必填字段列表。如果请求中缺少其中任何一个或为空，将抛出错误。
   requiredFields: ["name", "email", "message"]
 
-  # List of transformations to apply to any of the fields supplied. Keys are
-  # the name of the field and values are possible transformation types.
+  # 应用于所提供字段的转换列表。键为字段名，值为转换类型。
   transforms:
     email: md5
 
-  # reCAPTCHA (OPTIONAL)
-  # To enable reCAPTCHA:
-  # 1. Set `enabled` to `true`
-  # 2. Register your domain at https://www.google.com/recaptcha/ and choose reCAPTCHA V2
-  # 3. Uncomment `siteKey` and `secret` and fill them in with your values
+  # reCAPTCHA（可选）
+  # 启用 reCAPTCHA：
+  # 1. 将 `enabled` 设为 `true`
+  # 2. 在 https://www.google.com/recaptcha/ 注册您的域名并选择 reCAPTCHA V2
+  # 3. 取消注释 `siteKey` 和 `secret` 并填入您的值
   reCaptcha:
     enabled: false
     #siteKey: ""
-    # ENCRYPT reCaptcha secret key using Staticman /encrypt endpoint
-    # i.e. https://{STATICMAN API INSTANCE}/v3/encrypt/{your-site-secret}
-    # For more information, visit https://staticman.net/docs/encryption
+    # 使用 Staticman 的 /encrypt 端点加密 reCAPTCHA 密钥
+    # 即 https://{STATICMAN API INSTANCE}/v3/encrypt/{您的站点密钥}
+    # 更多信息请访问 https://staticman.net/docs/encryption
     #secret: ""
