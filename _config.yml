@@ -19,7 +19,7 @@ author: Majesticrise
 ###############################################
 
 navbar-links:
-  About Me: "关于我"
+  About Me: "aboutme"
   Resources:
     - Beautiful Jekyll: "https://beautifuljekyll.com"
     - Learn markdown: "https://www.markdowntutorial.com/"
