@@ -1,6 +1,6 @@
-<span class="post-meta post-reading-stats" data-reading-stats>
+<span class="post-meta post-reading-stats">
   <span class="d-none d-md-inline middot">&middot;</span>
-  <span id="post-word-count">本文约 -- 字</span>
+  <span id="post-word-count">本文约 {{ article_word_count | default: 0 }} 字</span>
   <span class="reading-stats-separator"> · </span>
-  <span id="post-read-minutes">预计阅读 -- 分钟</span>
+  <span id="post-read-minutes">预计阅读 {{ article_read_minutes | default: 1 }} 分钟</span>
 </span>

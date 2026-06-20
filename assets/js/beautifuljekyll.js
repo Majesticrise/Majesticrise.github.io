@@ -33,7 +33,6 @@ let BeautifulJekyllJS = {
     // show the big header image
     BeautifulJekyllJS.initImgs();
 
-    BeautifulJekyllJS.initArticleStats();
     BeautifulJekyllJS.initReadingProgress();
     BeautifulJekyllJS.initSearch();
   },
@@ -61,26 +60,6 @@ let BeautifulJekyllJS = {
       return;
     }
     document.documentElement.style.setProperty("--navbar-height", navbar.offsetHeight + "px");
-  },
-
-  initArticleStats : function() {
-    const wordCountEl = document.getElementById("post-word-count");
-    const readMinutesEl = document.getElementById("post-read-minutes");
-    const sourceEl = document.getElementById("post-text-source");
-
-    if (!wordCountEl || !readMinutesEl || !sourceEl) {
-      return;
-    }
-
-    const rawText = (sourceEl.textContent || "").replace(/\u00a0/g, " ");
-    const normalizedText = rawText.replace(/\s+/g, " ").trim();
-    const cjkCount = (normalizedText.match(/[\u4e00-\u9fff]/g) || []).length;
-    const latinTokenCount = (normalizedText.match(/[A-Za-z0-9]+(?:'[A-Za-z0-9]+)?/g) || []).length;
-    const count = cjkCount + latinTokenCount;
-    const minutes = Math.max(1, Math.ceil(count / 500));
-
-    wordCountEl.textContent = `本文约 ${count} 字`;
-    readMinutesEl.textContent = `预计阅读 ${minutes} 分钟`;
   },
 
   initImgs : function() {

@@ -2,6 +2,9 @@
 layout: base
 ---
 
+{% assign article_word_count = content | strip_html | strip_newlines | replace: " ", "" | size %}
+{% assign article_read_minutes = article_word_count | plus: 399 | divided_by: 400 %}
+
 {% include header.html type="post" %}
 
 <div class="reading-progress" aria-hidden="true">
@@ -42,8 +45,6 @@ layout: base
           {% endfor %}
         </div>
       {% endif %}
-
-      <div id="post-text-source" class="d-none">{{ content | strip_html | strip_newlines | xml_escape }}</div>
 
       <div class="blog-post">
         {{ content }}
