@@ -33,6 +33,7 @@ let BeautifulJekyllJS = {
     // show the big header image
     BeautifulJekyllJS.initImgs();
 
+    BeautifulJekyllJS.initReadingProgress();
     BeautifulJekyllJS.initSearch();
   },
 
@@ -139,6 +140,26 @@ let BeautifulJekyllJS = {
         $("body").removeClass("overflow-hidden");
       }
     });
+  },
+
+  initReadingProgress : function() {
+    const progressBar = document.getElementById("reading-progress-bar");
+    if (!progressBar) {
+      return;
+    }
+
+    const updateProgress = function() {
+      const scrollTop = window.pageYOffset || document.documentElement.scrollTop || document.body.scrollTop || 0;
+      const documentHeight = Math.max(document.documentElement.scrollHeight, document.body.scrollHeight);
+      const viewportHeight = window.innerHeight || document.documentElement.clientHeight || 0;
+      const maxScroll = documentHeight - viewportHeight;
+      const progress = maxScroll > 0 ? (scrollTop / maxScroll) * 100 : 0;
+      progressBar.style.width = Math.min(100, Math.max(0, progress)) + "%";
+    };
+
+    updateProgress();
+    window.addEventListener("scroll", updateProgress, { passive: true });
+    window.addEventListener("resize", updateProgress);
   }
 };
 
