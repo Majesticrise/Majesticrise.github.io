@@ -1,9 +1,6 @@
-<!--- "ReadTime on GitHub Jekyll" (c) 2020 Ruby Griffith Ramirez, MIT License -->
-
-{% assign word_count = page.content | strip_html | number_of_words %}
-{% assign read_minutes = word_count | plus: 199 | divided_by: 200 %}
-
-<span class="post-meta post-reading-stats">
+<span class="post-meta post-reading-stats" data-reading-stats>
   <span class="d-none d-md-inline middot">&middot;</span>
-  本文约 {{ word_count }} 字 · 预计阅读 {{ read_minutes }} 分钟
+  <span id="post-word-count">本文约 -- 字</span>
+  <span class="reading-stats-separator"> · </span>
+  <span id="post-read-minutes">预计阅读 -- 分钟</span>
 </span>

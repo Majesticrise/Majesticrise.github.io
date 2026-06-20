@@ -33,6 +33,7 @@ let BeautifulJekyllJS = {
     // show the big header image
     BeautifulJekyllJS.initImgs();
 
+    BeautifulJekyllJS.initArticleStats();
     BeautifulJekyllJS.initReadingProgress();
     BeautifulJekyllJS.initSearch();
   },
@@ -50,6 +51,36 @@ let BeautifulJekyllJS = {
     } else {
       $(".navbar").removeClass("navbar-dark").addClass("navbar-light");
     }
+
+    BeautifulJekyllJS.updateNavbarHeight();
+  },
+
+  updateNavbarHeight : function() {
+    const navbar = document.querySelector(".navbar");
+    if (!navbar) {
+      return;
+    }
+    document.documentElement.style.setProperty("--navbar-height", navbar.offsetHeight + "px");
+  },
+
+  initArticleStats : function() {
+    const wordCountEl = document.getElementById("post-word-count");
+    const readMinutesEl = document.getElementById("post-read-minutes");
+    const blogPost = document.querySelector(".blog-post");
+
+    if (!wordCountEl || !readMinutesEl || !blogPost) {
+      return;
+    }
+
+    const rawText = (blogPost.innerText || blogPost.textContent || "").replace(/\u00a0/g, " ");
+    const normalizedText = rawText.replace(/\s+/g, " ").trim();
+    const cjkCount = (normalizedText.match(/[\u4e00-\u9fff]/g) || []).length;
+    const latinTokenCount = (normalizedText.match(/[A-Za-z0-9]+(?:'[A-Za-z0-9]+)?/g) || []).length;
+    const count = cjkCount + latinTokenCount;
+    const minutes = Math.max(1, Math.ceil(count / 500));
+
+    wordCountEl.textContent = `本文约 ${count} 字`;
+    readMinutesEl.textContent = `预计阅读 ${minutes} 分钟`;
   },
 
   initImgs : function() {
@@ -158,8 +189,13 @@ let BeautifulJekyllJS = {
     };
 
     updateProgress();
+    BeautifulJekyllJS.updateNavbarHeight();
     window.addEventListener("scroll", updateProgress, { passive: true });
     window.addEventListener("resize", updateProgress);
+    window.addEventListener("resize", BeautifulJekyllJS.updateNavbarHeight);
+    $('#main-navbar').on('show.bs.collapse hidden.bs.collapse', function () {
+      setTimeout(BeautifulJekyllJS.updateNavbarHeight, 0);
+    });
   }
 };
 
