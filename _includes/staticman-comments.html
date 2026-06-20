@@ -4,7 +4,7 @@
     <!-- Start static comments -->
     <div class="js-comments">
       {% if site.data.comments[page.slug] %}
-        <h3 class="page__comments-title">{{ site.data.ui-text[site.locale].comments_title | default: "Comments" }}</h3>
+        <h3 class="page__comments-title">{{ site.data.ui-text[site.locale].comments_title | default: "评论" }}</h3>
         {% assign comments = site.data.comments[page.slug] | sort %}
         {% for comment in comments %}
           {% assign email = comment[1].email %}
@@ -19,38 +19,38 @@
     <!-- End static comments -->
     <!-- Start new comment form -->
     <div class="page__comments-form">
-      <h3 class="page__comments-title">{{ site.data.ui-text[site.locale].comments_label | default: "Leave a Comment" }}</h3>
-      <p class="small">{{ site.data.ui-text[site.locale].comment_form_info | default: "Your email address will not be published. Required fields are marked" }} <span class="required">*</span></p>
+      <h3 class="page__comments-title">{{ site.data.ui-text[site.locale].comments_label | default: "发表评论" }}</h3>
+      <p class="small">{{ site.data.ui-text[site.locale].comment_form_info | default: "您的电子邮箱地址不会公开。必填项已标注。" }} <span class="required">*</span></p>
       <form id="new_comment" class="page__comments-form js-form form" method="post">
         <div class="form-group">
-          <label for="comment-form-message">{{ site.data.ui-text[site.locale].comment_form_comment_label | default: "Comment" }} <small class="required">*</small></label><br>
+          <label for="comment-form-message">{{ site.data.ui-text[site.locale].comment_form_comment_label | default: "评论" }} <small class="required">*</small></label><br>
           <textarea type="text" rows="12" cols="36" id="comment-form-message" name="fields[message]" tabindex="1"></textarea>
-          <div class="small form-text"><a href="https://daringfireball.net/projects/markdown/">{{ site.data.ui-text[site.locale].comment_form_md_info | default: "Markdown is supported." }}</a></div>
+          <div class="small form-text"><a href="https://daringfireball.net/projects/markdown/">{{ site.data.ui-text[site.locale].comment_form_md_info | default: "支持 Markdown 语法。" }}</a></div>
         </div>
         <div class="form-group">
-          <label for="comment-form-name">{{ site.data.ui-text[site.locale].comment_form_name_label | default: "Name" }} <small class="required">*</small></label>
+          <label for="comment-form-name">{{ site.data.ui-text[site.locale].comment_form_name_label | default: "姓名" }} <small class="required">*</small></label>
           <input type="text" id="comment-form-name" name="fields[name]" tabindex="2" />
         </div>
         <div class="form-group">
-          <label for="comment-form-email">{{ site.data.ui-text[site.locale].comment_form_email_label | default: "Email address" }} <small class="required">*</small></label>
+          <label for="comment-form-email">{{ site.data.ui-text[site.locale].comment_form_email_label | default: "电子邮箱" }} <small class="required">*</small></label>
           <input type="email" id="comment-form-email" name="fields[email]" tabindex="3" />
         </div>
         <div class="form-group">
-          <label for="comment-form-url">{{ site.data.ui-text[site.locale].comment_form_website_label | default: "Website (optional)" }}</label>
+          <label for="comment-form-url">{{ site.data.ui-text[site.locale].comment_form_website_label | default: "网站（可选）" }}</label>
           <input type="url" id="comment-form-url" name="fields[url]" tabindex="4"/>
         </div>
         <div class="form-group d-none" style="display: none;">
           <input type="hidden" name="options[origin]" value="{{ page.url | absolute_url }}">
           <input type="hidden" name="options[slug]" value="{{ page.slug }}">
-          <label for="comment-form-location">Not used. Leave blank if you are a human.</label>
+          <label for="comment-form-location">此项不使用。如果你是真人，请留空。</label>
           <input type="text" id="comment-form-location" name="fields[hidden]" autocomplete="off"/>
           {% if site.staticman.reCaptcha.siteKey %}<input type="hidden" name="options[reCaptcha][siteKey]" value="{{ site.staticman.reCaptcha.siteKey }}">{% endif %}
           {% if site.staticman.reCaptcha.secret %}<input type="hidden" name="options[reCaptcha][secret]" value="{{ site.staticman.reCaptcha.secret }}">{% endif %}
         </div>
         <!-- Start comment form alert messaging -->
         <p class="d-none js-notice alert">
-          <strong class="js-notice-text-success d-none">{{ site.data.ui-text[site.locale].comment_success_msg | default: "Thanks for your comment! It will show on the site once it has been approved." }}</strong>
-          <strong class="js-notice-text-failure d-none">{{ site.data.ui-text[site.locale].comment_error_msg | default: "Sorry, there was an error with your submission. Please make sure all required fields have been completed and try again." }}</strong>
+          <strong class="js-notice-text-success d-none">{{ site.data.ui-text[site.locale].comment_success_msg | default: "感谢您的评论！审核通过后会显示在站点中。" }}</strong>
+          <strong class="js-notice-text-failure d-none">{{ site.data.ui-text[site.locale].comment_error_msg | default: "很抱歉，您的提交有误。请确认所有必填项都已填写后再试一次。" }}</strong>
         </p>
         <!-- End comment form alert messaging -->
         {% if site.staticman.reCaptcha.siteKey %}
@@ -59,8 +59,8 @@
           </div>
         {% endif %}
         <div class="form-group">
-          <button type="submit" id="comment-form-submit" tabindex="5" class="btn btn-primary btn-lg">{{ site.data.ui-text[site.locale].comment_btn_submit | default: "Submit Comment" }}</button>
-          <button type="submit" id="comment-form-submitted" tabindex="5" class="btn btn-primary btn-lg d-none" disabled>{{ site.data.ui-text[site.locale].comment_btn_submitted | default: "Submitted" }}</button>
+          <button type="submit" id="comment-form-submit" tabindex="5" class="btn btn-primary btn-lg">{{ site.data.ui-text[site.locale].comment_btn_submit | default: "提交评论" }}</button>
+          <button type="submit" id="comment-form-submitted" tabindex="5" class="btn btn-primary btn-lg d-none" disabled>{{ site.data.ui-text[site.locale].comment_btn_submitted | default: "已提交" }}</button>
         </div>
       </form>
     </div>
