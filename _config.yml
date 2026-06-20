@@ -9,7 +9,7 @@
 ############################
 
 # 网站名称（显示在标题和导航栏）
-title: Majesticrise 的博客
+title: 崛曦阁
 
 # 您的姓名（显示在页脚）
 author: Majesticrise
@@ -77,7 +77,7 @@ social-network-links:
 
 # 如果希望网站生成 RSS 订阅源，请提供一段描述
 # 订阅源的 URL 为 https://<您的网站>/feed.xml
-rss-description: Majesticrise 的博客更新订阅
+rss-description: 更新订阅
 
 ###########################
 # --- 通用选项 --- #
