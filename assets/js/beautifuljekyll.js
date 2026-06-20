@@ -66,13 +66,13 @@ let BeautifulJekyllJS = {
   initArticleStats : function() {
     const wordCountEl = document.getElementById("post-word-count");
     const readMinutesEl = document.getElementById("post-read-minutes");
-    const blogPost = document.querySelector(".blog-post");
+    const sourceEl = document.getElementById("post-text-source");
 
-    if (!wordCountEl || !readMinutesEl || !blogPost) {
+    if (!wordCountEl || !readMinutesEl || !sourceEl) {
       return;
     }
 
-    const rawText = (blogPost.innerText || blogPost.textContent || "").replace(/\u00a0/g, " ");
+    const rawText = (sourceEl.textContent || "").replace(/\u00a0/g, " ");
     const normalizedText = rawText.replace(/\s+/g, " ").trim();
     const cjkCount = (normalizedText.match(/[\u4e00-\u9fff]/g) || []).length;
     const latinTokenCount = (normalizedText.match(/[A-Za-z0-9]+(?:'[A-Za-z0-9]+)?/g) || []).length;

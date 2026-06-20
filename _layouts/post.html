@@ -43,6 +43,8 @@ layout: base
         </div>
       {% endif %}
 
+      <div id="post-text-source" class="d-none">{{ content | strip_html | strip_newlines | xml_escape }}</div>
+
       <div class="blog-post">
         {{ content }}
       </div>
