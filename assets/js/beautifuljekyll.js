@@ -33,6 +33,7 @@ let BeautifulJekyllJS = {
     // show the big header image
     BeautifulJekyllJS.initImgs();
 
+    BeautifulJekyllJS.initHomeCurrentTime();
     BeautifulJekyllJS.initReadingProgress();
     BeautifulJekyllJS.initSearch();
   },
@@ -60,6 +61,31 @@ let BeautifulJekyllJS = {
       return;
     }
     document.documentElement.style.setProperty("--navbar-height", navbar.offsetHeight + "px");
+  },
+
+  initHomeCurrentTime : function() {
+    const currentTimeEl = document.getElementById("home-current-time-value");
+    if (!currentTimeEl) {
+      return;
+    }
+
+    const weekdayNames = ["日曜日", "月曜日", "火曜日", "水曜日", "木曜日", "金曜日", "土曜日"];
+
+    const updateHomeTime = function() {
+      const now = new Date();
+      const year = now.getFullYear();
+      const month = now.getMonth() + 1;
+      const day = now.getDate();
+      const hours = String(now.getHours()).padStart(2, "0");
+      const minutes = String(now.getMinutes()).padStart(2, "0");
+      const seconds = String(now.getSeconds()).padStart(2, "0");
+      const weekday = weekdayNames[now.getDay()];
+
+      currentTimeEl.textContent = `${year}年${month}月${day}日 ${hours}:${minutes}:${seconds}（${weekday}）`;
+    };
+
+    updateHomeTime();
+    setInterval(updateHomeTime, 1000);
   },
 
   initImgs : function() {

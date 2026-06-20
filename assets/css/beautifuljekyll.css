@@ -179,9 +179,43 @@ img {
   display: inline;
 }
 
+.home-current-time {
+  margin: 0 0 1.5rem;
+  padding: 1rem 1.25rem;
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  border-radius: 0.875rem;
+  background: linear-gradient(135deg, rgba(0, 138, 255, 0.08), rgba(0, 133, 161, 0.04));
+  box-shadow: 0 0.5rem 1.5rem rgba(0, 0, 0, 0.04);
+}
+
+.home-current-time-label {
+  font-family: var(--header-font);
+  font-size: 0.8125rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--mid-col);
+  margin-bottom: 0.35rem;
+}
+
+.home-current-time-value {
+  font-family: var(--header-font);
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--text-col);
+}
+
 @media (max-width: 767.98px) {
   .post-reading-stats {
     line-height: 1.5;
+  }
+
+  .home-current-time {
+    padding: 0.875rem 1rem;
+  }
+
+  .home-current-time-value {
+    font-size: 1rem;
   }
 }
 
