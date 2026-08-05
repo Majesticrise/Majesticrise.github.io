@@ -9,8 +9,7 @@
 ############################
 
 # 网站名称（显示在标题和导航栏）
-title: 崛曦阁
-
+title: LEA聊天记录大赏
 # 您的姓名（显示在页脚）
 author: Majesticrise
 
@@ -144,7 +143,7 @@ footer-hover-col: "#0085A1"
 # 也可以使用图片替代颜色作为导航栏、页脚和页面背景
 #navbar-img: "/assets/img/bgimage.png"
 #footer-img: "/assets/img/bgimage.png"
-#page-img: "/assets/img/bgimage.png"
+page-img: "/assets/img/bgimage.png"
 
 # 为移动浏览器建议一种颜色作为浏览器主题色（仅少数移动浏览器支持）
 #mobile-theme-col: "#0085A1"
