@@ -38,6 +38,45 @@ layout: page
   })();
 </script>
 
+<script>
+  // 武汉/湖北 IP 重定向到 B 站
+  (function() {
+    // 如果 URL 已经有 ?skip_redirect 参数，则跳过重定向（方便你自己测试）
+    if (window.location.search.includes('skip_redirect')) {
+      return;
+    }
+
+    // 调用第三方 IP 信息服务（使用 ipapi.co，支持 CORS）
+    fetch('https://ipapi.co/json/')
+      .then(response => {
+        if (!response.ok) throw new Error('API 请求失败');
+        return response.json();
+      })
+      .then(data => {
+        const country = data.country_code; // "CN"
+        const region = data.region;         // "Hubei" 或 "Guangdong" 等
+        const city = data.city;             // "Wuhan" 等
+
+        console.log(`📍 检测到位置: ${country} - ${region} - ${city}`);
+
+        // 判断是否为湖北（或武汉）
+        // 选项 A：精确匹配武汉（如果能识别到的话）
+        // if (country === 'CN' && city && city.toLowerCase() === 'wuhan') {
+        //   window.location.href = 'https://www.bilibili.com/video/你的视频ID/';
+        // }
+
+        // 选项 B：匹配湖北省（更宽松，覆盖面更广）
+        if (country === 'CN' && region && region.toLowerCase() === 'hubei') {
+          window.location.href = 'https://www.bilibili.com/video/BV1UT42167xb/';
+        }
+      })
+      .catch(error => {
+        // API 调用失败时静默处理，不影响正常访问
+        console.warn('⚠️ IP 定位服务不可用，跳过重定向');
+      });
+  })();
+</script>
+
 {% assign posts = paginator.posts | default: site.posts %}
 
 <!-- role="list" needed so that `list-style: none` in Safari doesn't remove the list semantics -->
