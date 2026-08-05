@@ -128,7 +128,7 @@ navbar-var-length: false
 
 # 自定义网站颜色。颜色值可以是任何有效的 CSS 颜色值。
 
-page-col: "#FFFFFF"
+#page-col: "#FFFFFF"
 text-col: "#404040"
 link-col: "#008AFF"
 hover-col: "#0085A1"
