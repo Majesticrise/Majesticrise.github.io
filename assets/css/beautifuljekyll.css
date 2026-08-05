@@ -760,7 +760,7 @@ footer .footer-custom-content {
   top: 0;
   right: 0;
   bottom: 0;
-  background: rgba(0,0,0,0.32);
+  background: rgba(0,0,0,0.56);
   pointer-events: none;
   z-index: 0;
 }
@@ -768,6 +768,15 @@ footer .footer-custom-content {
 .intro-header.big-img .post-heading {
   position: relative;
   z-index: 1;
+}
+.intro-header.big-img .page-heading,
+.intro-header.big-img .post-heading,
+.intro-header.big-img .page-heading h1,
+.intro-header.big-img .post-heading h1,
+.intro-header.big-img .page-heading .page-subheading,
+.intro-header.big-img .post-heading .post-subheading {
+  color: #fff !important;
+  text-shadow: 0 2px 8px rgba(0,0,0,0.85) !important;
 }
 .intro-header.big-img {
   background: no-repeat center center;
