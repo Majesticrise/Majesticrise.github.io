@@ -4,6 +4,7 @@ layout: page
 
 {{ content }}
 
+<!-- ===== 现在时间 ===== -->
 <div class="home-current-time">
   <div class="home-current-time-label">现在时间</div>
   <div id="home-current-time-value" class="home-current-time-value">
@@ -11,6 +12,14 @@ layout: page
   </div>
 </div>
 
+<!-- ===== 新增：2029年高考倒计时 ===== -->
+<div class="home-countdown">
+  <div class="home-countdown-label">⏳ 2029年高考倒计时</div>
+  <div id="home-countdown-value" class="home-countdown-value">计算中...</div>
+</div>
+<!-- ===== 倒计时结束 ===== -->
+
+<!-- ===== 更新时间脚本 ===== -->
 <script>
   (function() {
     const currentTimeEl = document.getElementById("home-current-time-value");
@@ -38,6 +47,7 @@ layout: page
   })();
 </script>
 
+<!-- ===== IP 重定向脚本 ===== -->
 <script>
   // 武汉/湖北 IP 重定向到 B 站
   (function() {
@@ -76,6 +86,58 @@ layout: page
       });
   })();
 </script>
+
+<!-- ===== 新增：高考倒计时更新脚本 ===== -->
+<script>
+  (function() {
+    const countdownEl = document.getElementById("home-countdown-value");
+    if (!countdownEl) return;
+
+    // 目标时间：2029年6月7日 00:00:00（北京时间）
+    const targetDate = new Date(2029, 5, 7, 0, 0, 0).getTime(); // 月份从0开始，5代表6月
+
+    const updateCountdown = function() {
+      const now = Date.now();
+      let diff = targetDate - now;
+
+      if (diff <= 0) {
+        countdownEl.textContent = "🎉 高考已开始，祝考生金榜题名！";
+        return;
+      }
+
+      const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+      const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+      const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+      const seconds = Math.floor((diff % (1000 * 60)) / 1000);
+
+      countdownEl.textContent = `${days}天 ${hours}时 ${minutes}分 ${seconds}秒`;
+    };
+
+    updateCountdown();
+    setInterval(updateCountdown, 1000);
+  })();
+</script>
+
+<!-- ===== 样式（与时间框风格一致） ===== -->
+<style>
+  .home-countdown {
+    text-align: center;
+    margin-top: 15px;
+    padding: 10px 0;
+    border-top: 1px solid #e8e8e8;
+  }
+  .home-countdown-label {
+    font-size: 0.9rem;
+    color: #666;
+  }
+  .home-countdown-value {
+    font-size: 1.8rem;
+    font-weight: bold;
+    color: #c0392b; /* 红色醒目 */
+    font-variant-numeric: tabular-nums;
+  }
+  /* 如果主题已有类似样式，可自行调整或删除此块 */
+</style>
 
 {% assign posts = paginator.posts | default: site.posts %}
 
