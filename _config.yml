@@ -20,6 +20,7 @@ author: Majesticrise
 navbar-links:
   关于我: "aboutme"
   Resources:
+    - 资源: "resources"
     - Minebbs 插件: "https://www.minebbs.com/members/majesticrise.122701/"
   作者主页: "https://space.bilibili.com/3493114226411557"
 
@@ -285,6 +286,11 @@ exclude:
 plugins:
   - jekyll-paginate
   - jekyll-sitemap
+
+# 自定义集合：用于存放带取件码的资源文件
+collections:
+  resourceparts:
+    output: true
 
 # Beautiful Jekyll / Dean Attali
 # 2fc73a3a967e97599c9763d05e564189

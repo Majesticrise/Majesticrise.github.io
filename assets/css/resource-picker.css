@@ -1,0 +1,4 @@
+.resource-picker-inner h2{font-family:var(--header-font);font-weight:800}
+.resource-picker{padding:1.25rem 0}
+#resource-display{min-height:8rem;border:1px solid rgba(0,0,0,0.06);padding:1rem;border-radius:0.5rem;background-color:var(--page-col)}
+#resource-feedback{min-height:1.25rem}
