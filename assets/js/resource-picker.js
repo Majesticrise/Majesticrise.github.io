@@ -4,6 +4,9 @@
   const MAP_PATH = '/assets/resource-map.json';
   let resourceMap = null;
 
+  // ---------- 新增：一言缓存 ----------
+  let hitokotoCache = null; // 缓存当天一言，避免重复请求
+
   function base64Encode(str) {
     try {
       return btoa(unescape(encodeURIComponent(str)));
@@ -31,15 +34,91 @@
     container.innerHTML = html;
   }
 
-  function loadResourceForCode(code) {
-    if (!resourceMap) {
-      showFeedback('加载映射表中，请稍候...');
+  // ---------- 新增：获取今日日期字符串 YYYY-MM-DD ----------
+  function getTodayStr() {
+    const today = new Date();
+    const year = today.getFullYear();
+    const month = String(today.getMonth() + 1).padStart(2, '0');
+    const day = String(today.getDate()).padStart(2, '0');
+    return year + '-' + month + '-' + day;
+  }
+
+  // ---------- 新增：从 hitokoto API 获取一言 ----------
+  async function fetchHitokoto() {
+    try {
+      const response = await fetch('https://v1.hitokoto.cn');
+      if (!response.ok) throw new Error('网络响应失败');
+      const data = await response.json();
+      return {
+        text: data.hitokoto,
+        from: data.from || '未知出处',
+        uuid: data.uuid
+      };
+    } catch (error) {
+      console.error('一言获取失败:', error);
+      return null;
+    }
+  }
+
+  // ---------- 新增：显示一言到容器 ----------
+  async function showHitokoto() {
+    const container = document.getElementById('resource-display');
+    const lockArea = document.getElementById('lock-area');
+    const feedback = document.getElementById('resource-feedback');
+    if (!container) return;
+
+    // 显示加载状态
+    showFeedback('正在获取今日一言...', false);
+
+    // 如果有缓存则直接使用，否则请求
+    let hitokoto = hitokotoCache;
+    if (!hitokoto) {
+      hitokoto = await fetchHitokoto();
+      if (hitokoto) {
+        hitokotoCache = hitokoto;
+      }
+    }
+
+    if (!hitokoto) {
+      showFeedback('一言获取失败，请稍后重试');
       return;
     }
 
+    // 渲染一言到容器
+    const html = `
+      <blockquote style="font-size:1.2rem;border-left:4px solid var(--link-col);padding:1rem 1.5rem;margin:1.5rem 0;">
+        ${hitokoto.text}
+      </blockquote>
+      <p style="text-align:right;color:var(--mid-col);font-style:italic;">
+        —— ${hitokoto.from}
+        <a href="https://hitokoto.cn/?uuid=${hitokoto.uuid}" target="_blank" style="margin-left:0.5rem;font-size:0.8rem;text-decoration:none;">🔗</a>
+      </p>
+    `;
+    container.innerHTML = html;
+    container.style.display = 'block';
+    if (lockArea) lockArea.style.display = 'none';
+    clearFeedback();
+  }
+
+  // ---------- 修改：主加载函数 ----------
+  function loadResourceForCode(code) {
     const trimmed = code.trim();
     if (!trimmed) {
       showFeedback('请输入取件码');
+      return;
+    }
+
+    // ========== 新增：日期彩蛋检测 ==========
+    const todayStr = getTodayStr();
+    if (trimmed === todayStr) {
+      showHitokoto();
+      return; // 直接结束，不走下面的映射表逻辑
+    }
+    // ========== 日期彩蛋结束 ==========
+
+    // --- 原有逻辑：基于映射表加载 ---
+    if (!resourceMap) {
+      showFeedback('加载映射表中，请稍候...');
       return;
     }
 
