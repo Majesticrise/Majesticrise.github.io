@@ -4,10 +4,15 @@ jobs:
   build:
     name: Build Jekyll
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pages: write
+      id-token: write   # 部署到 GitHub Pages 需要此权限
+
     steps:
       - uses: actions/checkout@v4
 
-      # ---------- 新增：检查源文件是否存在 ----------
+      # ---------- 检查源文件 ----------
       - name: 📂 Check source files
         run: |
           echo "=== Root directory ==="
@@ -22,7 +27,7 @@ jobs:
           echo "=== _config.yml (collections section) ==="
           grep -A 5 "collections:" _config.yml || echo "❌ collections not found in _config.yml"
 
-      # ---------- 设置 Node.js 环境 ----------
+      # ---------- 设置 Node.js ----------
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
@@ -32,6 +37,7 @@ jobs:
       - name: Generate resource map
         run: node generate-map.js
 
+      # ---------- 安装 Ruby 和 Jekyll 依赖 ----------
       - uses: ruby/setup-ruby@v1
         with:
           ruby-version: '3.3'
@@ -39,6 +45,7 @@ jobs:
       - name: Install dependencies
         run: bundle install && bundle exec appraisal install
 
+      # ---------- 配置 Pages ----------
       - name: Setup Pages
         id: configure-pages
         uses: actions/configure-pages@v5
@@ -48,12 +55,13 @@ jobs:
           echo "---" > _config_ci.yml
           echo "baseurl: ${{ steps.configure-pages.outputs.base_path }}" >> _config_ci.yml
 
+      # ---------- 构建 Jekyll ----------
       - name: Build site
         env:
           JEKYLL_ENV: production
         run: bundle exec appraisal jekyll build --future --config _config_ci.yml,_config.yml
 
-      # ---------- 新增：检查生成的 _site 目录 ----------
+      # ---------- 检查生成结果 ----------
       - name: 🔍 Check generated site
         run: |
           echo "=== _site root directory ==="
@@ -68,5 +76,10 @@ jobs:
           echo "=== Full directory tree under _site (first 3 levels) ==="
           find _site -maxdepth 3 -type d | sort
 
+      # ---------- 上传构建产物 ----------
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
+
+      # ---------- 🚀 部署到 GitHub Pages（新增关键步骤） ----------
+      - name: Deploy to GitHub Pages
+        uses: actions/deploy-pages@v4
