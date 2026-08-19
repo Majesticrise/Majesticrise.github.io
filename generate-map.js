@@ -26,7 +26,7 @@ function main() {
     const m = content.match(/pickup_code:\s*"([^"]+)"/);
     if (m) {
       const code = m[1].trim();
-      const outName = f.replace(/\.md$/, '.html');
+      const outName = f.replace(/\.md$/, '.html').toLowerCase();
       map[base64Encode(code)] = outName;
     } else {
       console.warn(`文件 ${f} 缺少 pickup_code 字段，已跳过。`);
