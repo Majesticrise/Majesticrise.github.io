@@ -7,16 +7,30 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      # ---------- 新增：设置 Node.js 环境 ----------
+      # ---------- 新增：检查源文件是否存在 ----------
+      - name: 📂 Check source files
+        run: |
+          echo "=== Root directory ==="
+          ls -la
+          echo ""
+          echo "=== _resourceparts directory ==="
+          ls -la _resourceparts/ || echo "❌ _resourceparts NOT FOUND"
+          echo ""
+          echo "=== sample-001.md content (first 30 lines) ==="
+          head -30 _resourceparts/sample-001.md || echo "❌ sample-001.md NOT FOUND"
+          echo ""
+          echo "=== _config.yml (collections section) ==="
+          grep -A 5 "collections:" _config.yml || echo "❌ collections not found in _config.yml"
+
+      # ---------- 设置 Node.js 环境 ----------
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '18'   # 使用 LTS 版本
+          node-version: '18'
 
-      # ---------- 新增：生成资源映射表 ----------
+      # ---------- 生成资源映射表 ----------
       - name: Generate resource map
         run: node generate-map.js
-      # -----------------------------------------
 
       - uses: ruby/setup-ruby@v1
         with:
@@ -38,6 +52,21 @@ jobs:
         env:
           JEKYLL_ENV: production
         run: bundle exec appraisal jekyll build --future --config _config_ci.yml,_config.yml
+
+      # ---------- 新增：检查生成的 _site 目录 ----------
+      - name: 🔍 Check generated site
+        run: |
+          echo "=== _site root directory ==="
+          ls -la _site/
+          echo ""
+          echo "=== Looking for resourceparts directory ==="
+          find _site -type d -name "resourceparts" || echo "❌ resourceparts directory NOT FOUND"
+          echo ""
+          echo "=== Looking for sample-001.html ==="
+          find _site -name "sample-001.html" || echo "❌ sample-001.html NOT FOUND"
+          echo ""
+          echo "=== Full directory tree under _site (first 3 levels) ==="
+          find _site -maxdepth 3 -type d | sort
 
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
