@@ -258,17 +258,25 @@ kramdown:
 
 # 默认 YAML 值（更多信息请查阅 Jekyll 官方文档）
 defaults:
-  -
-    scope:
+  # 针对博客文章（_posts）
+  - scope:
       path: ""
       type: "posts"
     values:
       layout: "post"
-      comments: true  # 所有博客文章启用评论
-      social-share: true # 所有博客文章启用社交分享按钮
-  -
-    scope:
-      path: "" # 非文章的文件默认使用 "page" 布局
+      comments: true
+      social-share: true
+
+  # 针对自定义集合 resourceparts（存放取件码资源）
+  - scope:
+      path: ""
+      type: "resourceparts"     # 注意：类型名必须与集合名完全一致
+    values:
+      layout: "page"            # 使用 page 布局（也可以改为 post，但 page 更简洁）
+
+  # 针对所有其他页面（如 aboutme, resources 等）
+  - scope:
+      path: ""
     values:
       layout: "page"
 
@@ -291,6 +299,7 @@ plugins:
 collections:
   resourceparts:
     output: true
+    permalink: /:collection/:name.html   # 确保生成 /resourceparts/xxx.html
 
 # Beautiful Jekyll / Dean Attali
 # 2fc73a3a967e97599c9763d05e564189
