@@ -67,14 +67,17 @@ jobs:
           echo "=== _site root directory ==="
           ls -la _site/
           echo ""
-          echo "=== Looking for resourceparts directory ==="
-          find _site -type d -name "resourceparts" || echo "❌ resourceparts directory NOT FOUND"
+          echo "=== _site/resourceparts/ contents ==="
+          ls -la _site/resourceparts/ || echo "❌ resourceparts directory NOT FOUND"
           echo ""
           echo "=== Looking for sample-001.html ==="
           find _site -name "sample-001.html" || echo "❌ sample-001.html NOT FOUND"
           echo ""
-          echo "=== Full directory tree under _site (first 3 levels) ==="
-          find _site -maxdepth 3 -type d | sort
+          echo "=== Looking for Holy-Roman-Empire.html ==="
+          find _site -name "Holy-Roman-Empire.html" || echo "❌ Holy-Roman-Empire.html NOT FOUND"
+          echo ""
+          echo "=== Looking for Xiaohui.html ==="
+          find _site -name "Xiaohui.html" || echo "❌ Xiaohui.html NOT FOUND"
 
       # ---------- 上传构建产物 ----------
       - name: Upload artifact
