@@ -1,5 +1,4 @@
 ---
-layout: post
 title: "资源示例：第一条"
 date: 2026-08-18
 pickup_code: "ABC123"
