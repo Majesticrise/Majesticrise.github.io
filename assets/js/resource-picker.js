@@ -109,12 +109,19 @@
     }
 
     // ========== 新增：日期彩蛋检测 ==========
-    const todayStr = getTodayStr();
-    if (trimmed === todayStr) {
+    // 生成今天的两种格式
+    const today = new Date();
+    const year = today.getFullYear();
+    const month = String(today.getMonth() + 1).padStart(2, '0');
+    const day = String(today.getDate()).padStart(2, '0');
+    const todayFull = year + '-' + month + '-' + day;   
+    const todayShort = year + month + day;           
+
+    if (trimmed === todayFull || trimmed === todayShort) {
       showHitokoto();
-      return; // 直接结束，不走下面的映射表逻辑
+      return;
     }
-    // ========== 日期彩蛋结束 ==========
+
 
     // --- 原有逻辑：基于映射表加载 ---
     if (!resourceMap) {
