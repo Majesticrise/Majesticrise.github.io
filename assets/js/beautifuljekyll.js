@@ -38,18 +38,16 @@ let BeautifulJekyllJS = {
 
       mainNavbar.querySelectorAll('a:not(.dropdown-toggle)').forEach(function (link) {
         link.addEventListener('click', function () {
-          if (window.innerWidth < 1200) {
-            mainNavbar.classList.remove('show');
-            mainNavbar.setAttribute('aria-expanded', 'false');
-
-            const toggler = document.querySelector('.navbar-toggler');
-            if (toggler) {
-              toggler.setAttribute('aria-expanded', 'false');
-            }
+          if (window.innerWidth < 1200 && window.jQuery) {
+            window.jQuery(mainNavbar).collapse('hide');
           }
         });
       });
     }
+
+    window.addEventListener('themechange', function () {
+      setTimeout(BeautifulJekyllJS.initNavbar, 0);
+    });
 
     BeautifulJekyllJS.initReadingProgress();
     BeautifulJekyllJS.initSearch();

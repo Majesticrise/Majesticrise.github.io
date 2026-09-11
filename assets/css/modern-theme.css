@@ -348,10 +348,9 @@ footer a {
 .post-toc-wrapper {
   position: sticky;
   top: 6rem;
-  margin-left: 1.5rem;
-  width: 210px;
+  max-height: calc(100vh - 8rem);
+  overflow-y: auto;
   align-self: start;
-  display: block;
 }
 
 .post-toc {

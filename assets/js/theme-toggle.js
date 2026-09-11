@@ -15,6 +15,7 @@
       if (icon) icon.textContent = isDark ? '🌙' : '☀️';
       if (label) label.textContent = isDark ? '深色' : '浅色';
     }
+    window.dispatchEvent(new CustomEvent('themechange', { detail: { theme: normalized } }));
   }
 
   function getPreferredTheme() {

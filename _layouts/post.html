@@ -11,10 +11,6 @@ layout: base
   <div id="reading-progress-bar" class="reading-progress-bar"></div>
 </div>
 
-<aside class="post-toc-wrapper" aria-label="文章目录">
-  <div class="post-toc"></div>
-</aside>
-
 <main class="{% if page.full-width %} container-fluid {% else %} container-md {% endif %}">
   <div class="row">
     <div class="{% if page.full-width %} col {% else %} col-xl-8 offset-xl-2 col-lg-10 offset-lg-1 {% endif %}">
@@ -95,5 +91,11 @@ layout: base
       </ul>
       {% include comments.html %}
     </div>
+
+    <aside class="col-xl-2 d-none d-xl-block" aria-label="文章目录">
+      <div class="post-toc-wrapper">
+        <div class="post-toc"></div>
+      </div>
+    </aside>
   </div>
 </main>
