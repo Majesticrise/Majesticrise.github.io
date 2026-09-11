@@ -564,3 +564,17 @@ footer .theme-by * {
   color: var(--modern-accent);
   font-variant-numeric: tabular-nums;
 }
+
+.home-countdown-value {
+  color: #c0392b;
+}
+
+[data-theme="dark"] .home-countdown-value {
+  color: #f87171;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) .home-countdown-value {
+    color: #f87171;
+  }
+}
