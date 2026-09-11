@@ -118,27 +118,6 @@ layout: page
   })();
 </script>
 
-<!-- ===== 样式（与时间框风格一致） ===== -->
-<style>
-  .home-countdown {
-    text-align: center;
-    margin-top: 15px;
-    padding: 10px 0;
-    border-top: 1px solid #e8e8e8;
-  }
-  .home-countdown-label {
-    font-size: 0.9rem;
-    color: #666;
-  }
-  .home-countdown-value {
-    font-size: 1.8rem;
-    font-weight: bold;
-    color: #c0392b; /* 红色醒目 */
-    font-variant-numeric: tabular-nums;
-  }
-  /* 如果主题已有类似样式，可自行调整或删除此块 */
-</style>
-
 {% assign posts = paginator.posts | default: site.posts %}
 
 <!-- role="list" needed so that `list-style: none` in Safari doesn't remove the list semantics -->
@@ -207,8 +186,8 @@ layout: page
       {% endif %}
 
       <div class="post-entry">
-        {% assign excerpt_length = site.excerpt_length | default: 50 %}
-        {{ post.excerpt | strip_html | truncatewords: excerpt_length }}
+        {% assign excerpt_length = site.excerpt_length | default: 100 %}
+        {{ post.excerpt | strip_html | truncate: excerpt_length }}
         {% assign excerpt_word_count = post.excerpt | number_of_words %}
         {% if post.content != post.excerpt or excerpt_word_count > excerpt_length %}
           <a href="{{ post.url | absolute_url }}" class="post-read-more">[阅读全文]</a>
