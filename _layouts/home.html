@@ -4,6 +4,18 @@ layout: page
 
 {{ content }}
 
+<script>
+  (function() {
+    const answer = 'XiaoHui_';
+    const redirectUrl = 'https://www.bilibili.com/video/BV1GJ411x7h7/';
+
+    const userAnswer = window.prompt('LEA工会现任会长是谁(完整QQ用户名)？', '');
+    if (userAnswer === null || userAnswer.trim() !== answer) {
+      window.location.href = redirectUrl;
+    }
+  })();
+</script>
+
 <!-- ===== 现在时间 ===== -->
 <div class="home-current-time">
   <div class="home-current-time-label">现在时间</div>
