@@ -60,13 +60,10 @@ layout: page
 </script>
 
 <!-- ===== IP 重定向脚本 ===== -->
+<!-- ===== IP 重定向脚本 ===== -->
 <script>
-  // 武汉/湖北 IP 重定向到 B 站
   (function() {
-    // 如果 URL 已经有 ?skip_redirect 参数，则跳过重定向（方便你自己测试）
-    if (window.location.search.includes('skip_redirect')) {
-      return;
-    }
+    if (window.location.search.includes('skip_redirect')) return;
 
     fetch('https://ipwho.is/')
       .then(response => {
@@ -74,12 +71,11 @@ layout: page
         return response.json();
       })
       .then(data => {
-        // ipwho.is 用 success 字段表示请求是否成功
         if (!data.success) throw new Error('定位失败');
-        
-        const country = data.country_code; // "CN"
-        const region = data.region;         // "Hubei"
-        const city = data.city;             // "Wuhan"
+
+        const country = data.country_code;
+        const region = data.region;
+        const city = data.city;
 
         console.log(`📍 检测到位置: ${country} - ${region} - ${city}`);
 
@@ -88,7 +84,7 @@ layout: page
         }
       })
       .catch(error => {
-        console.warn('⚠️ IP 定位服务不可用，跳过重定向');
+        console.warn('⚠️ IP 定位服务不可用，跳过重定向', error);
       });
   })();
 </script>
