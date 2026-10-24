@@ -29,6 +29,19 @@
       <h1 class="page-title">最新文章</h1>
       <p class="page-lead">群聊记录、梗与一些乱七八糟的存档。</p>
 
+      <!-- 首页小部件：现在时间 / 高考倒计时
+           文案与目标日期在 assets/js/site-config.js 的 homeWidgets 里改 -->
+      <div class="home-widgets" id="home-widgets">
+        <div class="home-widget" id="widget-time" hidden>
+          <div class="home-widget__label">现在时间</div>
+          <div class="home-widget__value" id="home-time-value">--</div>
+        </div>
+        <div class="home-widget home-widget--countdown" id="widget-countdown" hidden>
+          <div class="home-widget__label">倒计时</div>
+          <div class="home-widget__value" id="home-countdown-value">计算中…</div>
+        </div>
+      </div>
+
       <!-- 站内搜索：基于 posts.json 的标题 / 摘要 / 标签 -->
       <div class="search-bar">
         <input

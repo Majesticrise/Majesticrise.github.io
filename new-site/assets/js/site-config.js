@@ -65,5 +65,23 @@ window.SITE_CONFIG = {
   hitokoto: {
     enabled: true,
     api: 'https://v1.hitokoto.cn'
+  },
+
+  /* ---------- 首页小部件：现在时间 / 高考倒计时 ----------
+   * 【在这里修改倒计时目标】target 填 YYYY-MM-DD，按当天零点计算。
+   * time.weekdayStyle: 'jp' 为旧站的日曜日风格，'cn' 为星期日风格。
+   */
+  homeWidgets: {
+    time: {
+      enabled: true,
+      label: '现在时间',
+      weekdayStyle: 'jp'
+    },
+    countdown: {
+      enabled: true,
+      label: '⏳ 2029年高考倒计时',
+      target: '2029-06-07',
+      doneText: '🎉 高考已开始，祝考生金榜题名！'
+    }
   }
 };

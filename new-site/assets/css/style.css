@@ -922,3 +922,55 @@ li + li { margin-top: 0.3em; }
     transition-duration: 0.01ms !important;
   }
 }
+
+/* ---------------- 18. 首页小部件：现在时间 / 高考倒计时 ---------------- */
+.home-widgets {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  margin: 0 0 28px;
+}
+
+.home-widget {
+  flex: 1 1 260px;
+  padding: 16px 20px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  background: linear-gradient(135deg, rgba(28, 111, 214, 0.07), rgba(28, 111, 214, 0.02));
+  box-shadow: var(--shadow-sm);
+  text-align: center;
+}
+
+.home-widget__label {
+  font-size: 0.85rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  color: var(--color-text-muted);
+  margin-bottom: 6px;
+}
+
+.home-widget__value {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--color-link);
+  font-variant-numeric: tabular-nums; /* 数字等宽，秒数跳动不抖动 */
+}
+
+/* 倒计时卡片：红色强调 */
+.home-widget--countdown {
+  background: linear-gradient(135deg, rgba(192, 57, 43, 0.07), rgba(192, 57, 43, 0.02));
+}
+
+.home-widget--countdown .home-widget__value {
+  color: var(--color-danger);
+}
+
+@media (max-width: 640px) {
+  .home-widget { flex-basis: 100%; }
+  .home-widget__value { font-size: 1.2rem; }
+}
+
+/* 深色模式：倒计时红色提亮 */
+@media (prefers-color-scheme: dark) {
+  .home-widget--countdown .home-widget__value { color: #f87171; }
+}

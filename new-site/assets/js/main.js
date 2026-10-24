@@ -105,8 +105,72 @@ if (initialQuery && searchInput) searchInput.value = initialQuery;
 // 支持 ?tag=标签 直接过滤
 const initialTag = params.get('tag') || '';
 
+/* ---------- 首页小部件：现在时间 / 高考倒计时 ----------
+ * 文案与目标日期在 site-config.js 的 homeWidgets 中配置。
+ */
+function initHomeWidgets() {
+  const widgetCfg = config.homeWidgets || {};
+  const timeCard = document.getElementById('widget-time');
+  const countdownCard = document.getElementById('widget-countdown');
+
+  // 现在时间（旧站的日曜日/月曜日星期风格可选）
+  if (timeCard && widgetCfg.time?.enabled !== false) {
+    timeCard.hidden = false;
+    const labelEl = timeCard.querySelector('.home-widget__label');
+    const valueEl = document.getElementById('home-time-value');
+    if (labelEl && widgetCfg.time.label) labelEl.textContent = widgetCfg.time.label;
+
+    const jpWeek = ['日曜日', '月曜日', '火曜日', '水曜日', '木曜日', '金曜日', '土曜日'];
+    const cnWeek = ['星期日', '星期一', '星期二', '星期三', '星期四', '星期五', '星期六'];
+    const week = widgetCfg.time.weekdayStyle === 'cn' ? cnWeek : jpWeek;
+    const pad = (n) => String(n).padStart(2, '0');
+
+    const updateTime = () => {
+      const now = new Date();
+      valueEl.textContent =
+        `${now.getFullYear()}年${now.getMonth() + 1}月${now.getDate()}日 ` +
+        `${pad(now.getHours())}:${pad(now.getMinutes())}:${pad(now.getSeconds())}（${week[now.getDay()]}）`;
+    };
+    updateTime();
+    setInterval(updateTime, 1000);
+  }
+
+  // 高考倒计时
+  if (countdownCard && widgetCfg.countdown?.enabled) {
+    countdownCard.hidden = false;
+    const labelEl = countdownCard.querySelector('.home-widget__label');
+    const valueEl = document.getElementById('home-countdown-value');
+    if (labelEl && widgetCfg.countdown.label) labelEl.textContent = widgetCfg.countdown.label;
+
+    const m = String(widgetCfg.countdown.target || '').match(/^(\d{4})-(\d{1,2})-(\d{1,2})$/);
+    if (!m) {
+      valueEl.textContent = '倒计时目标日期未配置';
+      return;
+    }
+    // 按本地时区当天零点计算
+    const target = new Date(Number(m[1]), Number(m[2]) - 1, Number(m[3]), 0, 0, 0).getTime();
+
+    const updateCountdown = () => {
+      const diff = target - Date.now();
+      if (diff <= 0) {
+        valueEl.textContent = widgetCfg.countdown.doneText || '🎉 高考已开始，祝考生金榜题名！';
+        return;
+      }
+      const days = Math.floor(diff / 86400000);
+      const hours = Math.floor((diff % 86400000) / 3600000);
+      const minutes = Math.floor((diff % 3600000) / 60000);
+      const seconds = Math.floor((diff % 60000) / 1000);
+      valueEl.textContent = `${days}天 ${hours}时 ${minutes}分 ${seconds}秒`;
+    };
+    updateCountdown();
+    setInterval(updateCountdown, 1000);
+  }
+}
+
 /* ---------- 启动 ---------- */
 (async function boot() {
+  initHomeWidgets();
+
   state.all = await loadPosts();
 
   if (initialTag) {
