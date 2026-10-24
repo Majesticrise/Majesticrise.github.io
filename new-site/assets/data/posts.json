@@ -1,5 +1,66 @@
 [
   {
+    "id": "2026-10-29-Wurst-vs-Meteor同功能实现对照",
+    "title": "Wurst vs Meteor：同功能实现对照",
+    "date": "2026-10-29",
+    "tags": [
+      "Minecraft",
+      "技术",
+      "Wurst7",
+      "Meteor"
+    ],
+    "summary": "以同一组功能为坐标，对照 Wurst7 与 Meteor 两个开源客户端的实现差异：架构取舍、事件模型、渲染与网络层。",
+    "url": "posts/2026-10-29-Wurst-vs-Meteor同功能实现对照.md"
+  },
+  {
+    "id": "2026-10-28-Meteor功能详解补充卷2",
+    "title": "Meteor Client 功能详解·补充卷 2：网络通信 / Mixin 逐条全表 / 渲染与 HUD / util 包",
+    "date": "2026-10-28",
+    "tags": [
+      "Minecraft",
+      "技术",
+      "Meteor"
+    ],
+    "summary": "补充卷 2：对外网络通信总表、212 个 Mixin 注入文件逐条全表、渲染与 HUD 基础设施、util 包。",
+    "url": "posts/2026-10-28-Meteor功能详解补充卷2.md"
+  },
+  {
+    "id": "2026-10-27-Meteor功能详解补充卷",
+    "title": "Meteor Client 功能详解·补充卷：流程图 / 工具层算法 / 设置默认值总表 / 命令语法 / 演进考古",
+    "date": "2026-10-27",
+    "tags": [
+      "Minecraft",
+      "技术",
+      "Meteor"
+    ],
+    "summary": "补充卷：核心功能时序图、工具层与寻路算法、全部设置默认值总表、命令语法表与演进考古。",
+    "url": "posts/2026-10-27-Meteor功能详解补充卷.md"
+  },
+  {
+    "id": "2026-10-26-Meteor功能实现详解",
+    "title": "Meteor Client 全部功能实现详解",
+    "date": "2026-10-26",
+    "tags": [
+      "Minecraft",
+      "技术",
+      "Meteor"
+    ],
+    "summary": "逐个拆解 Meteor Client 6 大类 169 个模块的实现机制，事实附文件路径与行号，关键处内联默认设置。",
+    "url": "posts/2026-10-26-Meteor功能实现详解.md"
+  },
+  {
+    "id": "2026-10-25-Meteor源码分析报告",
+    "title": "Meteor Client 全量源码分析报告（含 Baritone 前置依赖分析）",
+    "date": "2026-10-25",
+    "tags": [
+      "Minecraft",
+      "技术",
+      "Meteor"
+    ],
+    "summary": "Meteor Client 全量源码架构分析（含其维护的 Baritone fork 依赖面）：事件总线、模块注册、Mixin 体系与配置持久化，全部结论附文件路径与行号。",
+    "url": "posts/2026-10-25-Meteor源码分析报告.md"
+  },
+  {
     "id": "2026-10-24-Wurst7功能详解补充卷2",
     "title": "Wurst7 功能详解·补充卷 2：网络通信 / Mixin 全集 / 渲染基础设施",
     "date": "2026-10-24",
