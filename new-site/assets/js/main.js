@@ -4,7 +4,7 @@
  * ============================================================ */
 
 import {
-  initLayout, loadPosts, postCardHtml, emptyStateHtml, escapeHtml, config
+  initLayout, loadPosts, postCardHtml, emptyStateHtml, escapeHtml, config, applyEntranceGate
 } from './components.js';
 
 initLayout();
@@ -169,6 +169,9 @@ function initHomeWidgets() {
 
 /* ---------- 启动 ---------- */
 (async function boot() {
+  // 进门问答：答错会跳转，因此必须最先执行（见 site-config.js 的 entranceGate）
+  applyEntranceGate();
+
   initHomeWidgets();
 
   state.all = await loadPosts();

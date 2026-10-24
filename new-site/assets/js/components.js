@@ -339,7 +339,42 @@ export function mountGiscus(postId) {
   mount.appendChild(script);
 }
 
-/* ---------- 8. 页面通用初始化 ---------- */
+/* ---------- 8. 进门问答（旧站彩蛋，见 site-config.js 的 entranceGate） ---------- */
+/**
+ * 首页加载前弹出问答，答错或取消则跳转到 redirectUrl。
+ * 只应在首页（index.html）调用。
+ */
+export function applyEntranceGate() {
+  const gate = config.entranceGate;
+  if (!gate || !gate.enabled) return;
+
+  const sessionKey = 'lea:gate:passed';
+  if (gate.oncePerSession) {
+    try {
+      if (sessionStorage.getItem(sessionKey) === '1') return;
+    } catch { /* 隐私模式下 sessionStorage 不可用，忽略 */ }
+  }
+
+  let answer = null;
+  try {
+    answer = window.prompt(gate.question || '', '');
+  } catch {
+    return; // 浏览器禁用了弹窗时不拦截访客
+  }
+
+  if (answer !== null && String(answer).trim() === String(gate.answer ?? '')) {
+    if (gate.oncePerSession) {
+      try { sessionStorage.setItem(sessionKey, '1'); } catch { /* 忽略 */ }
+    }
+    return;
+  }
+
+  if (gate.redirectUrl) {
+    window.location.href = gate.redirectUrl;
+  }
+}
+
+/* ---------- 9. 页面通用初始化 ---------- */
 /** 每个页面在 DOM 就绪后调用一次 */
 export function initLayout() {
   renderHeader();

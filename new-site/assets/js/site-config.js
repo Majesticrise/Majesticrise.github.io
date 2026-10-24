@@ -67,6 +67,19 @@ window.SITE_CONFIG = {
     api: 'https://v1.hitokoto.cn'
   },
 
+  /* ---------- 进门问答（旧站彩蛋） ----------
+   * enabled: 打开后访问首页会先弹出问答，答错或取消则跳转 redirectUrl。
+   * 【在这里修改问答内容】question / answer / redirectUrl。
+   * oncePerSession: true 时答对一次后本次浏览器会话不再询问。
+   */
+  entranceGate: {
+    enabled: true,
+    question: 'LEA工会现任会长是谁(完整QQ用户名)？',
+    answer: 'XiaoHui_',
+    redirectUrl: 'https://www.bilibili.com/video/BV1GJ411x7h7/',
+    oncePerSession: false
+  },
+
   /* ---------- 首页小部件：现在时间 / 高考倒计时 ----------
    * 【在这里修改倒计时目标】target 填 YYYY-MM-DD，按当天零点计算。
    * time.weekdayStyle: 'jp' 为旧站的日曜日风格，'cn' 为星期日风格。
