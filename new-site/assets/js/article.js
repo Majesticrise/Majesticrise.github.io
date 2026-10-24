@@ -9,7 +9,8 @@
  * ============================================================ */
 
 import {
-  initLayout, loadPosts, findPostById, siteUrl, escapeHtml, formatDate, mountGiscus, enableLightbox
+  initLayout, loadPosts, findPostById, siteUrl, escapeHtml, formatDate, mountGiscus, enableLightbox,
+  requestGatePass
 } from './components.js';
 
 initLayout();
@@ -229,6 +230,20 @@ function showError(message, detail = '') {
   }
 
   const { data: fm, body: markdown } = parseFrontMatter(raw);
+
+  /* --- 加锁文章：Front Matter 里写了 `gate: true` 的，需先答对进门问答 ---
+   * 技术类、杂谈类文章不加此标识即可直接阅读（问答内容见 site-config.js）。
+   */
+  const gateLocked = (meta?.gate === true) ||
+    fm.gate === true || String(fm.gate).toLowerCase() === 'true';
+  if (gateLocked) {
+    const gate = window.SITE_CONFIG?.entranceGate || {};
+    if (!requestGatePass()) {
+      if (gate.redirectUrl) window.location.href = gate.redirectUrl;
+      showError('这篇文章已上锁', '回答正确才能阅读。');
+      return;
+    }
+  }
 
   // 预计阅读时长：按正文纯文本长度估算（中文约 400 字/分钟），至少 1 分钟
   const plainLength = markdown

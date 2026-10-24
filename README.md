@@ -52,6 +52,10 @@ push 后 GitHub Actions 自动重新生成清单并部署。想本地立即看�
 **新增取件码**：只改 `new-site/assets/data/resources.json`，照抄一条条目改键名和
 `html` 字段。
 
+**给文章上锁**：在文章 Front Matter 里加一行 `gate: true`，该文章被访问时会
+先弹出进门问答（问题/答案/跳转地址在 `site-config.js` 的 `entranceGate` 段），
+答对才能阅读。技术类、杂谈类文章不加此标识即可直接阅读。
+
 **改导航 / 页脚 / 评论 / 进门问答 / 统计**：全部在
 `new-site/assets/js/site-config.js`，文件内有中文注释标注维护位置。
 

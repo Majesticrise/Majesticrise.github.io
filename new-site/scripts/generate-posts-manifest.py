@@ -84,14 +84,18 @@ def main():
             continue
         raw = open(os.path.join(POSTS_DIR, name), encoding="utf-8").read()
         fm, body = parse_front_matter(raw)
-        posts.append({
+        item = {
             "id": name[:-3],
             "title": str(fm.get("title") or name[:-3]),
             "date": str(fm.get("date") or derive_date(name))[:10],
             "tags": [str(t) for t in fm.get("tags", [])] if isinstance(fm.get("tags"), list) else [],
             "summary": str(fm.get("summary") or derive_summary(body)),
             "url": f"posts/{name}",
-        })
+        }
+        # 加锁标识：Front Matter 里 gate: true 的文章需要答对进门问答
+        if str(fm.get("gate", "")).lower() == "true" or fm.get("gate") is True:
+            item["gate"] = True
+        posts.append(item)
 
     # 按日期倒序（同日期按 id 倒序，保证顺序稳定）
     posts.sort(key=lambda p: (p["date"], p["id"]), reverse=True)

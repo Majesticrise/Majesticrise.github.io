@@ -149,7 +149,7 @@ function generateManifest() {
 
     const id = filename.replace(/\.md$/i, '');
 
-    return {
+    const item = {
       id,
       title: String(data.title || id),
       date: String(data.date || deriveDateFromFilename(filename)),
@@ -158,6 +158,12 @@ function generateManifest() {
       // 前端会再拼站点根，这里只记录相对路径
       url: `posts/${filename}`
     };
+
+    // 加锁标识：Front Matter 里 gate: true 的文章需要答对进门问答
+    const locked = data.gate === true || String(data.gate).toLowerCase() === 'true';
+    if (locked) item.gate = true;
+
+    return item;
   });
 
   // 按日期倒序（同日期按 id 倒序，保证顺序稳定）

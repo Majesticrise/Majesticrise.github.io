@@ -7,10 +7,10 @@
 window.SITE_CONFIG = {
   /* ---------- 基础信息 ---------- */
   siteTitle: 'LEA聊天记录大赏',
-  siteSubtitle: '记录群聊里的荒诞与快乐',
+  siteSubtitle: '群聊存档 · Minecraft 技术 · 杂谈',
   author: 'Majesticrise',
   lang: 'zh-CN',
-  description: 'LEA聊天记录大赏 —— 由 Majesticrise 维护的聊天记录、群像与资源存档站。',
+  description: 'LEA聊天记录大赏 —— 群聊存档、Minecraft 技术笔记与杂谈，由 Majesticrise 维护。',
 
   /* ---------- 社交 / 联系方式（页脚使用） ---------- */
   email: 'majesticrise@qq.com',
@@ -75,14 +75,16 @@ window.SITE_CONFIG = {
     enabled: true
   },
 
-  /* ---------- 进门问答（旧站彩蛋） ----------
+  /* ---------- 进门问答（旧站彩蛋 + 加锁文章） ----------
    * enabled: 打开后访问首页会先弹出问答，答错或取消则跳转 redirectUrl。
    * 【在这里修改问答内容】question / answer / redirectUrl。
    * oncePerSession: true 时答对一次后本次浏览器会话不再询问。
+   * 文章加锁：在文章 Front Matter 里加一行 `gate: true`，
+   * 该文章被访问时同样会弹出这里的问答（见 article.js）。
    */
   entranceGate: {
     enabled: true,
-    question: 'LEA工会现任会长是谁(完整QQ用户名)？',
+    question: 'LEA工会现任社长是谁(完整QQ用户名)？',
     answer: 'XiaoHui_',
     redirectUrl: 'https://www.bilibili.com/video/BV1GJ411x7h7/',
     oncePerSession: false

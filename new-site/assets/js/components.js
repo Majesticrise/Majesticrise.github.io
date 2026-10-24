@@ -109,6 +109,8 @@ function normalizePosts(list) {
       date: String(post.date || '').slice(0, 10),
       tags: Array.isArray(post.tags) ? post.tags : (post.tags ? [post.tags] : []),
       summary: post.summary || '',
+      // 加锁标识：清单里 gate: true 的文章需要答对进门问答才能阅读
+      gate: post.gate === true,
       // url 统一成 'posts/xxx.md' 形式，渲染时再用 siteUrl() 解析
       url: post.url || `posts/${post.id}.md`
     }))
@@ -411,19 +413,21 @@ export function mountGiscus(postId) {
   mount.appendChild(script);
 }
 
-/* ---------- 8. 进门问答（旧站彩蛋，见 site-config.js 的 entranceGate） ---------- */
+/* ---------- 8. 进门问答（首页彩蛋 + 加锁文章，配置见 site-config.js） ---------- */
 /**
- * 首页加载前弹出问答，答错或取消则跳转到 redirectUrl。
- * 只应在首页（index.html）调用。
+ * 弹出问答，返回是否通过。
+ * 答对返回 true（oncePerSession 开启时记入 sessionStorage）；
+ * 答错/取消返回 false；浏览器禁用弹窗时放行（返回 true，不困住访客）。
+ * 调用方自行决定不通过时的行为（通常是跳转到 gate.redirectUrl）。
  */
-export function applyEntranceGate() {
+export function requestGatePass() {
   const gate = config.entranceGate;
-  if (!gate || !gate.enabled) return;
+  if (!gate || !gate.enabled) return true;
 
   const sessionKey = 'lea:gate:passed';
   if (gate.oncePerSession) {
     try {
-      if (sessionStorage.getItem(sessionKey) === '1') return;
+      if (sessionStorage.getItem(sessionKey) === '1') return true;
     } catch { /* 隐私模式下 sessionStorage 不可用，忽略 */ }
   }
 
@@ -431,17 +435,25 @@ export function applyEntranceGate() {
   try {
     answer = window.prompt(gate.question || '', '');
   } catch {
-    return; // 浏览器禁用了弹窗时不拦截访客
+    return true; // 浏览器禁用了弹窗时不拦截访客
   }
 
   if (answer !== null && String(answer).trim() === String(gate.answer ?? '')) {
     if (gate.oncePerSession) {
       try { sessionStorage.setItem(sessionKey, '1'); } catch { /* 忽略 */ }
     }
-    return;
+    return true;
   }
+  return false;
+}
 
-  if (gate.redirectUrl) {
+/**
+ * 首页进门问答：不通过则跳转到 redirectUrl。只在首页（index.html）调用。
+ */
+export function applyEntranceGate() {
+  const gate = config.entranceGate;
+  if (!gate || !gate.enabled) return;
+  if (!requestGatePass() && gate.redirectUrl) {
     window.location.href = gate.redirectUrl;
   }
 }
