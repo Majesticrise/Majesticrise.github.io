@@ -37,9 +37,26 @@
   --transition: 160ms ease;
 }
 
-/* 可选：跟随系统深色模式。若不需要，删除本段即可。 */
+/* 主题切换：深色变量集中在 :root[data-theme="dark"]（手动）
+   与 @media 内 :root:not([data-theme="light"])（跟随系统）两条通道。
+   切换按钮见导航栏，逻辑在 components.js，记忆在 localStorage（lea:theme）。 */
+:root[data-theme="dark"] {
+  --color-bg: #16181c;
+  --color-bg-soft: #1d2025;
+  --color-bg-muted: #24282e;
+  --color-text: #e4e6ea;
+  --color-text-soft: #b6bcc6;
+  --color-text-muted: #8b929c;
+  --color-link: #74a9f0;
+  --color-link-hover: #9cc4f7;
+  --color-border: #2f343b;
+  --color-accent: #74a9f0;
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.4);
+  --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.5);
+}
+
 @media (prefers-color-scheme: dark) {
-  :root {
+  :root:not([data-theme="light"]) {
     --color-bg: #16181c;
     --color-bg-soft: #1d2025;
     --color-bg-muted: #24282e;
@@ -970,7 +987,104 @@ li + li { margin-top: 0.3em; }
   .home-widget__value { font-size: 1.2rem; }
 }
 
-/* 深色模式：倒计时红色提亮 */
+/* 深色模式：倒计时红色提亮（跟随系统 + 手动切换两条通道） */
 @media (prefers-color-scheme: dark) {
-  .home-widget--countdown .home-widget__value { color: #f87171; }
+  :root:not([data-theme="light"]) .home-widget--countdown .home-widget__value { color: #f87171; }
+}
+
+:root[data-theme="dark"] .home-widget--countdown .home-widget__value { color: #f87171; }
+
+/* ---------------- 19. 主题切换按钮 / 回到顶部 / 灯箱 / 不蒜子 ---------------- */
+
+/* 导航栏主题切换按钮 */
+.theme-toggle {
+  width: 36px;
+  height: 36px;
+  padding: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+  line-height: 1;
+  background: transparent;
+  color: var(--color-text);
+  border: 1px solid var(--color-border);
+  border-radius: 999px;
+  cursor: pointer;
+  transition: var(--transition);
+}
+
+.theme-toggle:hover {
+  border-color: var(--color-accent);
+  background: var(--color-bg-muted);
+}
+
+/* 回到顶部按钮 */
+.back-to-top {
+  position: fixed;
+  right: 22px;
+  bottom: 22px;
+  z-index: 90;
+  width: 44px;
+  height: 44px;
+  padding: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--color-link);
+  background: var(--color-bg);
+  border: 1px solid var(--color-border);
+  border-radius: 999px;
+  box-shadow: var(--shadow-md);
+  cursor: pointer;
+  transition: var(--transition);
+}
+
+.back-to-top:hover {
+  color: #ffffff;
+  background: var(--color-link);
+  border-color: var(--color-link);
+}
+
+.back-to-top[hidden] { display: none; }
+
+/* 图片灯箱：点击文章/资源里的图片全屏查看 */
+.lightbox-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  background: rgba(0, 0, 0, 0.86);
+  opacity: 0;
+  pointer-events: none;
+  cursor: zoom-out;
+  transition: opacity 180ms ease;
+}
+
+.lightbox-overlay.is-open {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.lightbox-overlay img {
+  max-width: 94vw;
+  max-height: 94vh;
+  border-radius: var(--radius-md);
+  box-shadow: 0 8px 40px rgba(0, 0, 0, 0.6);
+}
+
+.article-body img,
+.resource-card__body img {
+  cursor: zoom-in;
+}
+
+/* 不蒜子统计（busuanzi 加载成功后自动取消隐藏） */
+.footer-busuanzi {
+  font-size: 0.85rem;
+  color: var(--color-text-muted);
 }

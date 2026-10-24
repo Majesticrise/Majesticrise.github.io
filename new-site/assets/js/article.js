@@ -9,7 +9,7 @@
  * ============================================================ */
 
 import {
-  initLayout, loadPosts, findPostById, siteUrl, escapeHtml, formatDate, mountGiscus
+  initLayout, loadPosts, findPostById, siteUrl, escapeHtml, formatDate, mountGiscus, enableLightbox
 } from './components.js';
 
 initLayout();
@@ -202,6 +202,16 @@ function showError(message, detail = '') {
 
   const { data: fm, body: markdown } = parseFrontMatter(raw);
 
+  // 预计阅读时长：按正文纯文本长度估算（中文约 400 字/分钟），至少 1 分钟
+  const plainLength = markdown
+    .replace(/```[\s\S]*?```/g, ' ')
+    .replace(/!\[[^\]]*\]\([^)]*\)/g, ' ')
+    .replace(/\[([^\]]*)\]\([^)]*\)/g, '$1')
+    .replace(/[#>*_`~-]/g, '')
+    .replace(/\s+/g, '')
+    .length;
+  const readMinutes = Math.max(1, Math.round(plainLength / 400));
+
   // 合并元数据：优先 posts.json，其次 Front Matter
   const post = {
     id: postId,
@@ -221,7 +231,10 @@ function showError(message, detail = '') {
     crumbEl.innerHTML = `<a href="${siteUrl('index.html')}">首页</a> / <span>${escapeHtml(post.title)}</span>`;
   }
   if (metaEl) {
-    metaEl.innerHTML = `<time datetime="${escapeHtml(post.date)}">${escapeHtml(formatDate(post.date))}</time>`;
+    metaEl.innerHTML =
+      `<time datetime="${escapeHtml(post.date)}">${escapeHtml(formatDate(post.date))}</time>` +
+      `<span class="meta-sep" aria-hidden="true"> · </span>` +
+      `<span class="read-minutes">预计阅读 ${readMinutes} 分钟</span>`;
   }
   if (tagsEl) {
     tagsEl.innerHTML = post.tags
@@ -260,6 +273,7 @@ function showError(message, detail = '') {
     bodyEl.innerHTML = html;
     fixRelativeUrls(bodyEl);
     buildToc(bodyEl);
+    enableLightbox(bodyEl); // 点击图片放大查看（聊天截图刚需）
   }
 
   /* --- 代码高亮（可选） --- */

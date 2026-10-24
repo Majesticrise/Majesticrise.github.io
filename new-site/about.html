@@ -3,6 +3,16 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
+  <!-- 站点图标 -->
+  <link rel="icon" type="image/png" href="assets/img/avatar-icon.png">
+
+  <!-- 在样式渲染前恢复手动选择的主题，避免深浅色闪烁（见 components.js 的主题切换） -->
+  <script>
+    try {
+      var __theme = localStorage.getItem('lea:theme');
+      if (__theme) document.documentElement.dataset.theme = __theme;
+    } catch (e) {}
+  </script>
   <title>关于我 · LEA聊天记录大赏</title>
   <meta name="description" content="关于 Majesticrise 与 LEA聊天记录大赏。">
   <meta name="author" content="Majesticrise">

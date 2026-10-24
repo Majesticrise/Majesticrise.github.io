@@ -67,6 +67,14 @@ window.SITE_CONFIG = {
     api: 'https://v1.hitokoto.cn'
   },
 
+  /* ---------- 不蒜子阅读量统计（页脚"本页阅读 N 次"） ----------
+   * 依赖第三方服务 busuanzi.ibruce.info，稳定性一般；加载失败时页脚不显示该行。
+   * 【在这里关闭统计】enabled 改成 false 即可。
+   */
+  busuanzi: {
+    enabled: true
+  },
+
   /* ---------- 进门问答（旧站彩蛋） ----------
    * enabled: 打开后访问首页会先弹出问答，答错或取消则跳转 redirectUrl。
    * 【在这里修改问答内容】question / answer / redirectUrl。

@@ -222,6 +222,8 @@ function renderHeader() {
         <nav class="site-nav" id="site-nav" aria-label="主导航">
           <ul class="nav-list">${navHtml}</ul>
         </nav>
+
+        <button class="theme-toggle" type="button" aria-label="切换深浅色主题" title="切换深浅色主题">🌙</button>
       </div>
     </header>
   `;
@@ -229,9 +231,56 @@ function renderHeader() {
   setupNavInteractions(mount);
 }
 
+/* ---------- 主题切换（深浅色，localStorage 记忆，页面内联脚本负责启动前恢复） ---------- */
+const THEME_KEY = 'lea:theme';
+
+function isDarkTheme() {
+  const manual = document.documentElement.dataset.theme;
+  if (manual === 'dark' || manual === 'light') return manual === 'dark';
+  return window.matchMedia('(prefers-color-scheme: dark)').matches;
+}
+
+function refreshThemeIcon(button) {
+  button.textContent = isDarkTheme() ? '☀️' : '🌙';
+}
+
+function setupThemeToggle(button) {
+  if (!button) return;
+  refreshThemeIcon(button);
+  button.addEventListener('click', () => {
+    const next = isDarkTheme() ? 'light' : 'dark';
+    document.documentElement.dataset.theme = next;
+    try {
+      localStorage.setItem(THEME_KEY, next);
+    } catch { /* 隐私模式下忽略 */ }
+    refreshThemeIcon(button);
+  });
+}
+
+/* ---------- 回到顶部按钮（长文滚动用） ---------- */
+function initBackToTop() {
+  if (document.querySelector('.back-to-top')) return;
+  const button = document.createElement('button');
+  button.className = 'back-to-top';
+  button.type = 'button';
+  button.setAttribute('aria-label', '回到顶部');
+  button.title = '回到顶部';
+  button.textContent = '↑';
+  button.hidden = true;
+  button.addEventListener('click', () => window.scrollTo({ top: 0, behavior: 'smooth' }));
+  document.body.appendChild(button);
+
+  const onScroll = () => { button.hidden = window.scrollY < 400; };
+  window.addEventListener('scroll', onScroll, { passive: true });
+  onScroll();
+}
+
 function setupNavInteractions(mount) {
   const toggle = mount.querySelector('.nav-toggle');
   const nav = mount.querySelector('.site-nav');
+
+  // 主题切换按钮
+  setupThemeToggle(mount.querySelector('.theme-toggle'));
 
   // 移动端折叠
   toggle?.addEventListener('click', () => {
@@ -269,6 +318,7 @@ function renderFooter() {
   const mount = document.getElementById('site-footer');
   if (!mount) return;
 
+  const busuanziEnabled = !!(config.busuanzi && config.busuanzi.enabled);
   const year = new Date().getFullYear();
   const social = [];
 
@@ -292,9 +342,23 @@ function renderFooter() {
         <p class="footer-copy">
           © ${year} ${escapeHtml(config.author || '')} · ${escapeHtml(config.siteTitle || '')}
         </p>
+        ${busuanziEnabled ? `
+        <p class="footer-busuanzi">
+          <!-- 不蒜子统计：脚本加载成功后会自动取消本行隐藏；失败则整行不显示 -->
+          <span id="busuanzi_container_page_pv" style="display:none">
+            👁 本页阅读 <span id="busuanzi_value_page_pv"></span> 次
+          </span>
+        </p>` : ''}
       </div>
     </footer>
   `;
+
+  if (busuanziEnabled) {
+    const script = document.createElement('script');
+    script.src = 'https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js';
+    script.async = true;
+    document.body.appendChild(script);
+  }
 }
 
 /* ---------- 7. giscus 评论（默认关闭，见 site-config.js） ---------- */
@@ -374,9 +438,51 @@ export function applyEntranceGate() {
   }
 }
 
-/* ---------- 9. 页面通用初始化 ---------- */
+/* ---------- 9. 图片灯箱 ---------- */
+/**
+ * 给容器内的图片开启点击放大（聊天截图、资源图等）。
+ * 点击遮罩或按 Esc 关闭。用在文章正文和资源内容上。
+ */
+export function enableLightbox(container) {
+  if (!container || container.dataset.lightbox === 'on') return;
+  container.dataset.lightbox = 'on';
+
+  container.addEventListener('click', (event) => {
+    const img = event.target.closest('img');
+    if (!img) return;
+    openLightbox(img.currentSrc || img.src, img.alt);
+  });
+}
+
+function openLightbox(src, alt) {
+  let overlay = document.getElementById('lightbox-overlay');
+  if (!overlay) {
+    overlay = document.createElement('div');
+    overlay.id = 'lightbox-overlay';
+    overlay.className = 'lightbox-overlay';
+    overlay.setAttribute('role', 'dialog');
+    overlay.setAttribute('aria-label', '图片查看');
+    overlay.innerHTML = '<img alt="">';
+    overlay.addEventListener('click', closeLightbox);
+    document.addEventListener('keydown', (event) => {
+      if (event.key === 'Escape') closeLightbox();
+    });
+    document.body.appendChild(overlay);
+  }
+  const big = overlay.querySelector('img');
+  big.src = src;
+  big.alt = alt || '';
+  overlay.classList.add('is-open');
+}
+
+function closeLightbox() {
+  document.getElementById('lightbox-overlay')?.classList.remove('is-open');
+}
+
+/* ---------- 10. 页面通用初始化 ---------- */
 /** 每个页面在 DOM 就绪后调用一次 */
 export function initLayout() {
   renderHeader();
   renderFooter();
+  initBackToTop();
 }
