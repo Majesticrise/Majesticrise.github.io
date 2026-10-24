@@ -345,8 +345,16 @@ function renderFooter() {
         ${busuanziEnabled ? `
         <p class="footer-busuanzi">
           <!-- 不蒜子统计：脚本加载成功后会自动取消本行隐藏；失败则整行不显示 -->
+          <span id="busuanzi_container_site_pv" style="display:none">
+            本站总访问量 <span id="busuanzi_value_site_pv"></span> 次
+          </span>
+          <span aria-hidden="true"> · </span>
+          <span id="busuanzi_container_site_uv" style="display:none">
+            访客数 <span id="busuanzi_value_site_uv"></span> 人
+          </span>
+          <span aria-hidden="true"> · </span>
           <span id="busuanzi_container_page_pv" style="display:none">
-            👁 本页阅读 <span id="busuanzi_value_page_pv"></span> 次
+            本页阅读 <span id="busuanzi_value_page_pv"></span> 次
           </span>
         </p>` : ''}
       </div>
