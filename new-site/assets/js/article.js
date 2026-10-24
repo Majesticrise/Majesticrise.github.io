@@ -14,11 +14,17 @@ import {
 
 initLayout();
 
+/* ---------- 依赖（全部本地化在 assets/vendor/，不依赖外部 CDN） ----------
+ *   - marked.js   ：Markdown 渲染
+ *   - highlight.js：代码高亮（亮/暗两套样式，跟随当前主题）
+ *   - DOMPurify   ：清洗渲染结果，防止 Markdown 中的脚本注入
+ */
 const CDN = {
-  marked: 'https://cdn.jsdelivr.net/npm/marked@12.0.2/marked.min.js',
-  highlightJs: 'https://cdn.jsdelivr.net/npm/highlight.js@11.9.0/lib/common.min.js',
-  highlightCss: 'https://cdn.jsdelivr.net/npm/highlight.js@11.9.0/styles/github.min.css',
-  purify: 'https://cdn.jsdelivr.net/npm/dompurify@3.1.6/dist/purify.min.js'
+  marked: siteUrl('assets/vendor/marked/marked.min.js'),
+  highlightJs: siteUrl('assets/vendor/highlight/highlight.min.js'),
+  highlightCssLight: siteUrl('assets/vendor/highlight/styles/github.min.css'),
+  highlightCssDark: siteUrl('assets/vendor/highlight/styles/github-dark.min.css'),
+  purify: siteUrl('assets/vendor/purify/purify.min.js')
 };
 
 const titleEl = document.getElementById('article-title');
@@ -46,12 +52,25 @@ function loadScript(src) {
   return loaderCache.get(src);
 }
 
-function loadCss(href) {
-  if (document.querySelector(`link[href="${href}"]`)) return;
+function loadCss(href, id) {
+  const selector = id ? `link[id="${id}"]` : `link[href="${href}"]`;
+  if (document.querySelector(selector)) return;
   const link = document.createElement('link');
+  if (id) link.id = id;
   link.rel = 'stylesheet';
   link.href = href;
   document.head.appendChild(link);
+}
+
+/* 代码高亮双主题：跟随手动切换（data-theme）和系统偏好 */
+function applyHljsTheme() {
+  const light = document.getElementById('hljs-light');
+  const dark = document.getElementById('hljs-dark');
+  if (!light || !dark) return;
+  const isDark = document.documentElement.dataset.theme === 'dark' ||
+    (!document.documentElement.dataset.theme && window.matchMedia('(prefers-color-scheme: dark)').matches);
+  light.disabled = isDark;
+  dark.disabled = !isDark;
 }
 
 /* ---------- Front Matter 解析（详情页兜底用） ---------- */
@@ -86,14 +105,23 @@ function parseFrontMatter(raw) {
 
 /* ---------- 相对图片/链接修正 ---------- */
 // Markdown 里的 ./img/a.png 原本是相对 posts/ 目录的，渲染后要指回真实位置。
+// 顺带给图片加懒加载（聊天长图多，首屏外不加载）。
 function fixRelativeUrls(container) {
-  container.querySelectorAll('img[src], a[href]').forEach((node) => {
-    const attr = node.tagName === 'IMG' ? 'src' : 'href';
-    const value = node.getAttribute(attr);
+  container.querySelectorAll('img').forEach((img) => {
+    img.loading = 'lazy';
+    img.decoding = 'async';
+    const value = img.getAttribute('src');
+    if (value && !/^(https?:|mailto:|tel:|data:|#|\/)/i.test(value)) {
+      img.src = new URL(value, siteUrl('posts/')).href;
+    }
+  });
+
+  container.querySelectorAll('a[href]').forEach((node) => {
+    const value = node.getAttribute('href');
     if (!value) return;
     // 跳过外链、锚点、绝对路径、data:
     if (/^(https?:|mailto:|tel:|data:|#|\/)/i.test(value)) return;
-    node.setAttribute(attr, new URL(value, siteUrl('posts/')).href);
+    node.setAttribute('href', new URL(value, siteUrl('posts/')).href);
   });
 
   // 所有外链新窗口打开
@@ -276,15 +304,23 @@ function showError(message, detail = '') {
     enableLightbox(bodyEl); // 点击图片放大查看（聊天截图刚需）
   }
 
-  /* --- 代码高亮（可选） --- */
+  /* --- 代码高亮（本地双主题，跟随深浅色切换） --- */
   try {
+    loadCss(CDN.highlightCssLight, 'hljs-light');
+    loadCss(CDN.highlightCssDark, 'hljs-dark');
     await loadScript(CDN.highlightJs);
-    loadCss(CDN.highlightCss);
     if (window.hljs && bodyEl) {
       bodyEl.querySelectorAll('pre code').forEach((block) => {
         window.hljs.highlightElement(block);
       });
     }
+    applyHljsTheme();
+    // 手动切换主题（data-theme 变化）或系统偏好变化时同步高亮主题
+    new MutationObserver(applyHljsTheme).observe(document.documentElement, {
+      attributes: true,
+      attributeFilter: ['data-theme']
+    });
+    window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', applyHljsTheme);
   } catch {
     console.warn('[highlight.js] 未加载，代码块保持无高亮');
   }

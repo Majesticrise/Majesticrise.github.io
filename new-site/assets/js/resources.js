@@ -103,7 +103,11 @@ function showResult(html, title) {
     a.setAttribute('rel', 'noopener noreferrer');
   });
 
-  // 资源内容里的图片支持点击放大
+  // 资源内容里的图片：懒加载 + 点击放大
+  resultEl.querySelectorAll('img').forEach((img) => {
+    img.loading = 'lazy';
+    img.decoding = 'async';
+  });
   enableLightbox(resultEl);
 
   document.getElementById('reset-btn-inline')?.addEventListener('click', resetView);
