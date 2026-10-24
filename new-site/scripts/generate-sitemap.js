@@ -38,7 +38,8 @@ const STATIC_PAGES = [
   { loc: 'index.html', changefreq: 'daily', priority: '1.0' },
   { loc: 'about.html', changefreq: 'monthly', priority: '0.6' },
   { loc: 'resources.html', changefreq: 'monthly', priority: '0.6' },
-  { loc: 'tags.html', changefreq: 'weekly', priority: '0.5' }
+  { loc: 'tags.html', changefreq: 'weekly', priority: '0.5' },
+  { loc: 'archive.html', changefreq: 'weekly', priority: '0.5' }
 ];
 
 function escapeXml(value) {

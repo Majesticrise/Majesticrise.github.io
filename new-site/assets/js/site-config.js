@@ -35,6 +35,7 @@ window.SITE_CONFIG = {
       ]
     },
     { label: '标签', href: 'tags.html' },
+    { label: '归档', href: 'archive.html' },
     { label: '作者主页', href: 'https://space.bilibili.com/3493114226411557', external: true }
   ],
 

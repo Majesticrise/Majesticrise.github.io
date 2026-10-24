@@ -4,7 +4,7 @@
  * ============================================================ */
 
 import {
-  initLayout, loadPosts, postCardHtml, emptyStateHtml, escapeHtml, config, applyEntranceGate
+  initLayout, loadPosts, postCardHtml, emptyStateHtml, escapeHtml, config, applyEntranceGate, siteUrl
 } from './components.js';
 
 initLayout();
@@ -66,8 +66,37 @@ function renderList(reset = false) {
   }
 }
 
-/* ---------- 搜索：标题 / 摘要 / 标签 ---------- */
-function applyFilter(keyword) {
+/* ---------- 搜索：标题 / 摘要 / 标签 / 正文全文 ----------
+ * 首次输入关键词时才在后台拉取全部文章正文建立索引（约 1MB，只建一次），
+ * 建好前先按元信息过滤，建好后自动用同一关键词重新过滤。
+ */
+let fullIndex = null;      // Map<postId, 正文小写文本>
+let indexBuilding = null;  // 防止重复构建
+
+function ensureFullIndex() {
+  if (fullIndex) return Promise.resolve();
+  if (!indexBuilding) {
+    indexBuilding = (async () => {
+      const entries = await Promise.all(state.all.map(async (post) => {
+        try {
+          const res = await fetch(siteUrl(post.url), { cache: 'no-cache' });
+          if (!res.ok) return [post.id, ''];
+          let raw = await res.text();
+          raw = raw.replace(/^---[\s\S]*?\r?\n---\r?\n/, '');  // 去掉 Front Matter
+          raw = raw.replace(/```[\s\S]*?```/g, ' ')
+                   .replace(/[#>*_`~\[\]()!|]/g, ' ');
+          return [post.id, raw.toLowerCase()];
+        } catch {
+          return [post.id, ''];
+        }
+      }));
+      fullIndex = new Map(entries);
+    })();
+  }
+  return indexBuilding;
+}
+
+async function applyFilter(keyword) {
   state.keyword = keyword.trim();
   const kw = state.keyword.toLowerCase();
 
@@ -75,12 +104,30 @@ function applyFilter(keyword) {
     state.filtered = state.all.slice();
     if (resultHint) resultHint.textContent = '';
   } else {
-    state.filtered = state.all.filter((post) => {
+    const metaHit = state.all.filter((post) => {
       const haystack = [post.title, post.summary, post.tags.join(' ')].join(' ').toLowerCase();
       return haystack.includes(kw);
     });
-    if (resultHint) {
-      resultHint.innerHTML = `关键词 <strong>${escapeHtml(state.keyword)}</strong> · 命中 ${state.filtered.length} 篇`;
+
+    if (fullIndex) {
+      // 全文索引就绪：元信息命中 + 正文命中 合并（保持日期倒序）
+      const ids = new Set(metaHit.map((p) => p.id));
+      state.all.forEach((p) => {
+        if ((fullIndex.get(p.id) || '').includes(kw)) ids.add(p.id);
+      });
+      state.filtered = state.all.filter((p) => ids.has(p.id));
+      if (resultHint) {
+        resultHint.innerHTML = `关键词 <strong>${escapeHtml(state.keyword)}</strong> · 命中 ${state.filtered.length} 篇（含正文）`;
+      }
+    } else {
+      state.filtered = metaHit;
+      if (resultHint) {
+        resultHint.innerHTML = `关键词 <strong>${escapeHtml(state.keyword)}</strong> · 命中 ${state.filtered.length} 篇（正文索引加载中…）`;
+      }
+      // 后台建索引，建好后若关键词未变则自动重新过滤
+      ensureFullIndex().then(() => {
+        if (state.keyword === keyword.trim()) applyFilter(keyword);
+      });
     }
   }
 

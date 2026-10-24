@@ -1088,3 +1088,113 @@ li + li { margin-top: 0.3em; }
   font-size: 0.85rem;
   color: var(--color-text-muted);
 }
+
+/* ---------------- 20. 代码复制按钮 / Mermaid 图表 ---------------- */
+
+.article-body pre,
+.resource-card__body pre {
+  position: relative; /* 复制按钮的定位基准 */
+}
+
+.code-copy-btn {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  padding: 3px 10px;
+  font-size: 0.78rem;
+  color: var(--color-text-soft);
+  background: var(--color-bg-soft);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  opacity: 0;
+  cursor: pointer;
+  transition: var(--transition);
+}
+
+pre:hover .code-copy-btn,
+.code-copy-btn:focus-visible {
+  opacity: 1;
+}
+
+.code-copy-btn:hover {
+  color: var(--color-link);
+  border-color: var(--color-link);
+}
+
+/* Mermaid 图表容器 */
+.mermaid {
+  margin: 20px 0;
+  padding: 16px;
+  display: flex;
+  justify-content: center;
+  overflow-x: auto;
+  background: var(--color-bg-soft);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+}
+
+.mermaid svg {
+  max-width: 100%;
+  height: auto;
+}
+
+/* ---------------- 21. 归档页 ---------------- */
+
+.archive-year {
+  margin-bottom: 36px;
+}
+
+.archive-year__title {
+  font-size: 1.4rem;
+  margin: 0 0 14px;
+  padding-bottom: 8px;
+  border-bottom: 2px solid var(--color-border);
+}
+
+.archive-year__count {
+  font-size: 0.9rem;
+  font-weight: 400;
+  color: var(--color-text-muted);
+}
+
+.archive-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.archive-item {
+  display: flex;
+  align-items: baseline;
+  gap: 12px;
+  padding: 8px 0;
+  border-bottom: 1px dashed var(--color-border);
+}
+
+.archive-item__date {
+  flex: 0 0 auto;
+  font-family: var(--font-mono);
+  font-size: 0.85rem;
+  color: var(--color-text-muted);
+}
+
+.archive-item__title {
+  color: var(--color-text);
+  text-decoration: none;
+}
+
+.archive-item__title:hover {
+  color: var(--color-link);
+}
+
+.archive-item__tags {
+  margin-left: auto;
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+@media (max-width: 640px) {
+  .archive-item { flex-wrap: wrap; }
+  .archive-item__tags { margin-left: 0; }
+}

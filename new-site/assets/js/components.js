@@ -500,6 +500,48 @@ function closeLightbox() {
   document.getElementById('lightbox-overlay')?.classList.remove('is-open');
 }
 
+/* ---------- 9.5 代码块复制按钮 ---------- */
+/**
+ * 给容器内所有 <pre> 加"复制"按钮（文章正文与资源内容共用）。
+ */
+export function addCopyButtons(container) {
+  if (!container) return;
+  container.querySelectorAll('pre').forEach((pre) => {
+    if (pre.querySelector('.code-copy-btn')) return;
+    const btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = 'code-copy-btn';
+    btn.textContent = '复制';
+    btn.setAttribute('aria-label', '复制代码');
+    btn.addEventListener('click', async () => {
+      const code = pre.querySelector('code');
+      const text = code ? code.innerText : pre.innerText;
+      let ok = false;
+      try {
+        await navigator.clipboard.writeText(text);
+        ok = true;
+      } catch {
+        // 后备方案：隐藏 textarea + execCommand（剪贴板 API 不可用时）
+        try {
+          const ta = document.createElement('textarea');
+          ta.value = text;
+          ta.style.position = 'fixed';
+          ta.style.opacity = '0';
+          document.body.appendChild(ta);
+          ta.select();
+          ok = document.execCommand('copy');
+          ta.remove();
+        } catch {
+          ok = false;
+        }
+      }
+      btn.textContent = ok ? '已复制 ✓' : '复制失败';
+      setTimeout(() => { btn.textContent = '复制'; }, 1500);
+    });
+    pre.appendChild(btn);
+  });
+}
+
 /* ---------- 10. 页面通用初始化 ---------- */
 /** 每个页面在 DOM 就绪后调用一次 */
 export function initLayout() {

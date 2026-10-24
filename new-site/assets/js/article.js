@@ -10,7 +10,7 @@
 
 import {
   initLayout, loadPosts, findPostById, siteUrl, escapeHtml, formatDate, mountGiscus, enableLightbox,
-  requestGatePass
+  requestGatePass, addCopyButtons
 } from './components.js';
 
 initLayout();
@@ -25,7 +25,8 @@ const CDN = {
   highlightJs: siteUrl('assets/vendor/highlight/highlight.min.js'),
   highlightCssLight: siteUrl('assets/vendor/highlight/styles/github.min.css'),
   highlightCssDark: siteUrl('assets/vendor/highlight/styles/github-dark.min.css'),
-  purify: siteUrl('assets/vendor/purify/purify.min.js')
+  purify: siteUrl('assets/vendor/purify/purify.min.js'),
+  mermaid: siteUrl('assets/vendor/mermaid/mermaid.min.js')
 };
 
 const titleEl = document.getElementById('article-title');
@@ -72,6 +73,48 @@ function applyHljsTheme() {
     (!document.documentElement.dataset.theme && window.matchMedia('(prefers-color-scheme: dark)').matches);
   light.disabled = isDark;
   dark.disabled = !isDark;
+}
+
+/* ---------- Mermaid 图表：仅有 mermaid 代码块时才按需加载（约 3MB） ---------- */
+async function renderMermaidBlocks(container) {
+  const blocks = [...container.querySelectorAll('code.language-mermaid')];
+  if (!blocks.length) return;
+
+  try {
+    await loadScript(CDN.mermaid);
+    if (!window.mermaid) throw new Error('mermaid 未就绪');
+
+    const isDark = document.documentElement.dataset.theme === 'dark' ||
+      (!document.documentElement.dataset.theme && window.matchMedia('(prefers-color-scheme: dark)').matches);
+    window.mermaid.initialize({
+      startOnLoad: false,
+      securityLevel: 'strict',
+      theme: isDark ? 'dark' : 'default'
+    });
+
+    for (const code of blocks) {
+      const pre = code.closest('pre');
+      if (!pre) continue;
+      const div = document.createElement('div');
+      div.className = 'mermaid';
+      div.textContent = code.textContent;
+      pre.replaceWith(div);
+      try {
+        await window.mermaid.run({ nodes: [div] });
+      } catch (err) {
+        // 语法错误时回退为源码展示，不让整页挂掉
+        console.warn('[mermaid] 图表渲染失败，保留源码展示', err);
+        const preFallback = document.createElement('pre');
+        const codeFallback = document.createElement('code');
+        codeFallback.className = 'language-mermaid';
+        codeFallback.textContent = div.textContent;
+        preFallback.appendChild(codeFallback);
+        div.replaceWith(preFallback);
+      }
+    }
+  } catch (err) {
+    console.warn('[mermaid] 未加载，图表保持源码展示', err);
+  }
 }
 
 /* ---------- Front Matter 解析（详情页兜底用） ---------- */
@@ -322,7 +365,7 @@ function showError(message, detail = '') {
     enableLightbox(bodyEl); // 点击图片放大查看（聊天截图刚需）
   }
 
-  /* --- 代码高亮（本地双主题，跟随深浅色切换） --- */
+  /* --- 代码高亮（本地双主题，跟随深浅色切换） + 复制按钮 + Mermaid 图表 --- */
   try {
     loadCss(CDN.highlightCssLight, 'hljs-light');
     loadCss(CDN.highlightCssDark, 'hljs-dark');
@@ -341,6 +384,11 @@ function showError(message, detail = '') {
     window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', applyHljsTheme);
   } catch {
     console.warn('[highlight.js] 未加载，代码块保持无高亮');
+  }
+
+  if (bodyEl) {
+    addCopyButtons(bodyEl);
+    await renderMermaidBlocks(bodyEl);
   }
 
   /* --- 上一篇 / 下一篇 --- */
