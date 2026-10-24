@@ -97,8 +97,11 @@ function showResult(html, title) {
   resultEl.hidden = false;
   if (pickerEl) pickerEl.hidden = true;
 
-  // 结果里的外链新窗口打开
+  // 外链新窗口打开；站内链接保持当前页跳转
   resultEl.querySelectorAll('a[href^="http"]').forEach((a) => {
+    try {
+      if (new URL(a.href, location.href).origin === location.origin) return;
+    } catch { /* 非法 URL 按外链处理 */ }
     a.setAttribute('target', '_blank');
     a.setAttribute('rel', 'noopener noreferrer');
   });

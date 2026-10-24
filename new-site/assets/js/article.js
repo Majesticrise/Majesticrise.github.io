@@ -125,8 +125,11 @@ function fixRelativeUrls(container) {
     node.setAttribute('href', new URL(value, siteUrl('posts/')).href);
   });
 
-  // 所有外链新窗口打开
+  // 外链新窗口打开；站内链接（ rewritten 后同源）保持当前页跳转
   container.querySelectorAll('a[href^="http"]').forEach((a) => {
+    try {
+      if (new URL(a.href, location.href).origin === location.origin) return;
+    } catch { /* 非法 URL 按外链处理 */ }
     a.setAttribute('target', '_blank');
     a.setAttribute('rel', 'noopener noreferrer');
   });
