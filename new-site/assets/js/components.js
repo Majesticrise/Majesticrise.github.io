@@ -448,11 +448,12 @@ export function requestGatePass() {
 }
 
 /**
- * 首页进门问答：不通过则跳转到 redirectUrl。只在首页（index.html）调用。
+ * 首页进门问答（旧站彩蛋）：不通过则跳转到 redirectUrl。
+ * 只在首页（index.html）调用；是否启用由 entranceGate.homeEnabled 控制。
  */
 export function applyEntranceGate() {
   const gate = config.entranceGate;
-  if (!gate || !gate.enabled) return;
+  if (!gate || !gate.enabled || !gate.homeEnabled) return;
   if (!requestGatePass() && gate.redirectUrl) {
     window.location.href = gate.redirectUrl;
   }

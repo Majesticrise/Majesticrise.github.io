@@ -75,8 +75,9 @@ window.SITE_CONFIG = {
     enabled: true
   },
 
-  /* ---------- 进门问答（旧站彩蛋 + 加锁文章） ----------
-   * enabled: 打开后访问首页会先弹出问答，答错或取消则跳转 redirectUrl。
+  /* ---------- 进门问答（加锁文章用；首页彩蛋默认关闭） ----------
+   * enabled: 总开关。关闭后首页与加锁文章都不再弹问答。
+   * homeEnabled: 是否在访问首页时弹问答（旧站彩蛋）。
    * 【在这里修改问答内容】question / answer / redirectUrl。
    * oncePerSession: true 时答对一次后本次浏览器会话不再询问。
    * 文章加锁：在文章 Front Matter 里加一行 `gate: true`，
@@ -84,6 +85,7 @@ window.SITE_CONFIG = {
    */
   entranceGate: {
     enabled: true,
+    homeEnabled: false,
     question: 'LEA工会现任社长是谁(完整QQ用户名)？',
     answer: 'XiaoHui_',
     redirectUrl: 'https://www.bilibili.com/video/BV1GJ411x7h7/',
