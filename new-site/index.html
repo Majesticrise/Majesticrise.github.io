@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>LEA聊天记录大赏</title>
+  <meta name="description" content="LEA聊天记录大赏 —— 由 Majesticrise 维护的聊天记录、群像与资源存档站。">
+  <meta name="author" content="Majesticrise">
+
+  <!-- Open Graph -->
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="LEA聊天记录大赏">
+  <meta property="og:description" content="记录群聊里的荒诞与快乐。">
+  <meta property="og:locale" content="zh_CN">
+
+  <!-- RSS -->
+  <link rel="alternate" type="application/rss+xml" title="LEA聊天记录大赏" href="feed.xml">
+
+  <!-- 样式：相对路径，放在任意子目录都能用 -->
+  <link rel="stylesheet" href="assets/css/style.css">
+</head>
+<body>
+  <!-- 导航栏由 assets/js/components.js 注入（在这里修改导航请改 assets/js/site-config.js） -->
+  <div id="site-header"></div>
+
+  <main class="site-main" id="main">
+    <div class="container">
+
+      <h1 class="page-title">最新文章</h1>
+      <p class="page-lead">群聊记录、梗与一些乱七八糟的存档。</p>
+
+      <!-- 站内搜索：基于 posts.json 的标题 / 摘要 / 标签 -->
+      <div class="search-bar">
+        <input
+          type="search"
+          id="search-input"
+          class="search-input"
+          placeholder="搜索标题、摘要或标签…"
+          aria-label="站内搜索">
+      </div>
+      <p class="search-hint" id="search-hint" role="status" aria-live="polite"></p>
+
+      <!-- 文章列表由 assets/js/main.js 渲染 -->
+      <div class="post-list" id="post-list">
+        <p class="empty-state">正在加载文章…</p>
+      </div>
+
+      <div class="load-more-wrap">
+        <button class="btn btn--primary" id="load-more" type="button" hidden>加载更多</button>
+        <p class="list-status" id="list-status"></p>
+      </div>
+
+    </div>
+  </main>
+
+  <!-- 页脚由 assets/js/components.js 注入 -->
+  <div id="site-footer"></div>
+
+  <!-- 站点配置必须先加载（普通脚本） -->
+  <script src="assets/js/site-config.js"></script>
+  <!-- 页面逻辑（ES Module） -->
+  <script type="module" src="assets/js/main.js"></script>
+</body>
+</html>

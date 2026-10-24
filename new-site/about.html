@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>关于我 · LEA聊天记录大赏</title>
+  <meta name="description" content="关于 Majesticrise 与 LEA聊天记录大赏。">
+  <meta name="author" content="Majesticrise">
+  <link rel="alternate" type="application/rss+xml" title="LEA聊天记录大赏" href="feed.xml">
+  <link rel="stylesheet" href="assets/css/style.css">
+</head>
+<body>
+  <div id="site-header"></div>
+
+  <main class="site-main" id="main">
+    <div class="container">
+      <h1 class="page-title">关于我</h1>
+      <p class="page-lead">一个把群聊里发生过的事认真存档的人。</p>
+
+      <section class="about-card">
+        <h2>这里是哪儿</h2>
+        <p>
+          <strong>LEA聊天记录大赏</strong> 是一个纯静态的存档站，用来收集、整理和展示群聊中出现过的
+          有趣片段、人物群像、梗与相关资源。所有内容都以 Markdown 文件的形式保存在仓库里，
+          由前端直接读取渲染，不依赖任何服务端。
+        </p>
+        <p>
+          站点由 <strong>Majesticrise</strong> 维护。如果你在自己的群里也见过类似的荒诞现场，
+          欢迎通过下面的方式联系我。
+        </p>
+      </section>
+
+      <section class="about-card">
+        <h2>联系方式</h2>
+        <ul class="about-list">
+          <li class="about-list__row">
+            <span class="about-list__label">邮箱</span>
+            <span class="about-list__value">
+              <a href="mailto:majesticrise@qq.com">majesticrise@qq.com</a>
+            </span>
+          </li>
+          <li class="about-list__row">
+            <span class="about-list__label">GitHub</span>
+            <span class="about-list__value">
+              <a href="https://github.com/Majesticrise" target="_blank" rel="noopener noreferrer">
+                github.com/Majesticrise
+              </a>
+            </span>
+          </li>
+          <li class="about-list__row">
+            <span class="about-list__label">Bilibili</span>
+            <span class="about-list__value">
+              <a href="https://space.bilibili.com/3493114226411557" target="_blank" rel="noopener noreferrer">
+                作者主页
+              </a>
+            </span>
+          </li>
+          <li class="about-list__row">
+            <span class="about-list__label">Minebbs</span>
+            <span class="about-list__value">
+              <a href="https://www.minebbs.com/members/majesticrise.122701/" target="_blank" rel="noopener noreferrer">
+                Minebbs 插件页
+              </a>
+            </span>
+          </li>
+        </ul>
+      </section>
+
+      <section class="about-card">
+        <h2>关于这个站的技术</h2>
+        <ul>
+          <li>纯静态：原生 HTML / CSS / JavaScript（ES Module），没有框架、没有构建步骤。</li>
+          <li>内容：每篇文章是 <code>posts/</code> 下的一个 Markdown 文件，带 Front Matter。</li>
+          <li>渲染：浏览器端用 <a href="https://marked.js.org/" target="_blank" rel="noopener noreferrer">marked.js</a> 解析 Markdown，
+              可选 <a href="https://highlightjs.org/" target="_blank" rel="noopener noreferrer">highlight.js</a> 做代码高亮。</li>
+          <li>索引：GitHub Actions 在推送时扫描 <code>posts/*.md</code> 生成 <code>assets/data/posts.json</code>。</li>
+          <li>部署：GitHub Pages 直接托管 <code>new-site/</code> 目录，不支持 Jekyll。</li>
+        </ul>
+      </section>
+
+      <p class="muted">
+        本站内容仅供存档与娱乐，如有冒犯请联系删除。
+      </p>
+    </div>
+  </main>
+
+  <div id="site-footer"></div>
+
+  <script src="assets/js/site-config.js"></script>
+  <script type="module" src="assets/js/page-init.js"></script>
+</body>
+</html>

@@ -1,0 +1,6 @@
+User-agent: *
+Allow: /
+Disallow: /scripts/
+Disallow: /assets/data/
+
+# 生成的 sitemap 地址由 scripts/generate-sitemap.js 维护

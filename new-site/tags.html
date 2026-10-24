@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>标签 · LEA聊天记录大赏</title>
+  <meta name="description" content="按标签浏览 LEA聊天记录大赏的全部文章。">
+  <meta name="author" content="Majesticrise">
+  <link rel="alternate" type="application/rss+xml" title="LEA聊天记录大赏" href="feed.xml">
+  <link rel="stylesheet" href="assets/css/style.css">
+</head>
+<body>
+  <div id="site-header"></div>
+
+  <main class="site-main" id="main">
+    <div class="container">
+      <h1 class="page-title">标签</h1>
+      <p class="page-lead">点击标签筛选文章，再次点击同一标签可取消筛选。</p>
+
+      <!-- 标签云由 assets/js/tags.js 渲染 -->
+      <div class="tag-cloud" id="tag-cloud">
+        <p class="empty-state">正在加载标签…</p>
+      </div>
+
+      <h2 id="tag-heading">全部文章</h2>
+      <p style="margin-bottom:24px">
+        <button class="btn btn--ghost" id="tag-clear" type="button" hidden>清除筛选</button>
+      </p>
+
+      <div class="post-list" id="tag-results"></div>
+    </div>
+  </main>
+
+  <div id="site-footer"></div>
+
+  <script src="assets/js/site-config.js"></script>
+  <script type="module" src="assets/js/tags.js"></script>
+</body>
+</html>

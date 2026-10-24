@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>LEA聊天记录大赏</title>
+    <link>https://majesticrise.github.io/</link>
+    <description>更新订阅</description>
+    <language>zh-CN</language>
+    <lastBuildDate>Wed, 19 Aug 2026 00:00:00 +0800</lastBuildDate>
+    <atom:link href="https://majesticrise.github.io/feed.xml" rel="self" type="application/rss+xml" />
+
+    <!--
+      ============================================================
+      【说明】本文件是静态模板。
+      正式内容由 scripts/generate-feed.js 在 GitHub Actions 中
+      根据 assets/data/posts.json 自动覆盖生成，请勿手工维护条目。
+      ============================================================
+    -->
+
+    <item>
+      <title>你好，世界</title>
+      <link>https://majesticrise.github.io/article.html?post=2026-08-19-hello</link>
+      <guid isPermaLink="false">2026-08-19-hello</guid>
+      <pubDate>Wed, 19 Aug 2026 00:00:00 +0800</pubDate>
+      <description>站点的第一篇文章：说明这个博客是做什么的，以及内容如何组织。</description>
+      <category>公告</category>
+      <category>建站</category>
+    </item>
+
+    <item>
+      <title>三店逸仙：第一幕</title>
+      <link>https://majesticrise.github.io/article.html?post=2026-08-20-world</link>
+      <guid isPermaLink="false">2026-08-20-world</guid>
+      <pubDate>Thu, 20 Aug 2026 00:00:00 +0800</pubDate>
+      <description>示例长文：展示较长的 Markdown 正文、二级三级标题、引用与代码块在详情页中的呈现效果。</description>
+      <category>群像</category>
+      <category>三店逸仙</category>
+      <category>聊天记录</category>
+    </item>
+
+  </channel>
+</rss>

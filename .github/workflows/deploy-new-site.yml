@@ -1,0 +1,131 @@
+# ============================================================
+#  Deploy new-site/ to GitHub Pages
+#  这是 **实际生效** 的工作流（GitHub 只读仓库根目录的
+#  .github/workflows/）。new-site/ 里有一份同内容的模板。
+#
+#  注意：本仓库根目录目前仍是被 Jekyll 托管的旧站。
+#  一旦启用本工作流发布，Pages 的 Source 需要改成
+#  "GitHub Actions"，旧站会被 new-site 覆盖。
+#  测试阶段请保持 publish=false（默认），只跑构建并下载 artifact。
+# ============================================================
+
+name: Deploy new-site to GitHub Pages
+
+on:
+  push:
+    branches:
+      - master        # 当前默认分支
+      - main          # 如果以后改名为 main
+      - 'test/**'     # 测试分支：只构建，不发布
+    paths:
+      - 'new-site/**'
+      - '.github/workflows/deploy-new-site.yml'
+  workflow_dispatch:
+    inputs:
+      publish:
+        description: '是否真的发布到 GitHub Pages（测试分支保持 false）'
+        required: false
+        default: 'false'
+        type: choice
+        options:
+          - 'false'
+          - 'true'
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages-new-site
+  cancel-in-progress: true
+
+jobs:
+  # ---------------------------------------------------------
+  # 1. 构建：安装 Node、生成 posts.json / feed.xml / sitemap.xml
+  # ---------------------------------------------------------
+  build:
+    name: Build static site
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Generate posts manifest
+        working-directory: new-site
+        run: node scripts/generate-posts-manifest.js
+
+      - name: Compute SITE_URL
+        id: site
+        run: |
+          REPO="${{ github.event.repository.name }}"
+          OWNER="${{ github.repository_owner }}"
+          if [ "$REPO" = "${OWNER}.github.io" ]; then
+            URL="https://${OWNER}.github.io"
+          else
+            URL="https://${OWNER}.github.io/${REPO}"
+          fi
+          echo "url=${URL}" >> "$GITHUB_OUTPUT"
+
+      - name: Generate RSS feed
+        working-directory: new-site
+        env:
+          SITE_URL: ${{ steps.site.outputs.url }}
+        run: node scripts/generate-feed.js
+
+      - name: Generate sitemap
+        working-directory: new-site
+        env:
+          SITE_URL: ${{ steps.site.outputs.url }}
+        run: node scripts/generate-sitemap.js
+
+      - name: Show generated files
+        run: |
+          echo "::group::posts.json"
+          head -n 30 new-site/assets/data/posts.json
+          echo "::endgroup::"
+          ls -la new-site/feed.xml new-site/sitemap.xml
+
+      - name: Configure Pages
+        uses: actions/configure-pages@v5
+
+      # 只打包 new-site/，目录内有 .nojekyll，Jekyll 不会介入
+      - name: Upload Pages artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: new-site
+
+      # 额外一份普通 artifact，测试分支可以直接下载 zip 预览
+      - name: Upload preview artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: new-site-preview
+          path: new-site
+          retention-days: 14
+
+  # ---------------------------------------------------------
+  # 2. 发布：仅在 master/main 推送，或手动 publish=true 时执行
+  # ---------------------------------------------------------
+  deploy:
+    name: Deploy to Pages
+    needs: build
+    runs-on: ubuntu-latest
+
+    if: |
+      (github.event_name == 'push' && (github.ref == 'refs/heads/master' || github.ref == 'refs/heads/main')) ||
+      (github.event_name == 'workflow_dispatch' && inputs.publish == 'true')
+
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+
+    steps:
+      - name: Deploy
+        id: deployment
+        uses: actions/deploy-pages@v4

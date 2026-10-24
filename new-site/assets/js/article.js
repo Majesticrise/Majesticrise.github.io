@@ -1,0 +1,283 @@
+/* ============================================================
+ * article.js —— 文章详情页逻辑
+ * 对应页面：article.html?post=<文件名去 .md>
+ *
+ * 依赖（CDN，按需加载）：
+ *   - marked.js   ：把 Markdown 渲染成 HTML
+ *   - highlight.js：代码块语法高亮（可选，加载失败不影响阅读）
+ *   - DOMPurify   ：清洗渲染结果，避免 Markdown 中的脚本注入（可选）
+ * ============================================================ */
+
+import {
+  initLayout, loadPosts, findPostById, siteUrl, escapeHtml, formatDate, mountGiscus
+} from './components.js';
+
+initLayout();
+
+const CDN = {
+  marked: 'https://cdn.jsdelivr.net/npm/marked@12.0.2/marked.min.js',
+  highlightJs: 'https://cdn.jsdelivr.net/npm/highlight.js@11.9.0/lib/common.min.js',
+  highlightCss: 'https://cdn.jsdelivr.net/npm/highlight.js@11.9.0/styles/github.min.css',
+  purify: 'https://cdn.jsdelivr.net/npm/dompurify@3.1.6/dist/purify.min.js'
+};
+
+const titleEl = document.getElementById('article-title');
+const metaEl = document.getElementById('article-meta');
+const tagsEl = document.getElementById('article-tags');
+const bodyEl = document.getElementById('article-body');
+const tocEl = document.getElementById('article-toc');
+const pagerEl = document.getElementById('article-pager');
+const crumbEl = document.getElementById('article-crumb');
+
+/* ---------- 依赖加载（每个只加载一次） ---------- */
+const loaderCache = new Map();
+
+function loadScript(src) {
+  if (!loaderCache.has(src)) {
+    loaderCache.set(src, new Promise((resolve, reject) => {
+      const el = document.createElement('script');
+      el.src = src;
+      el.async = true;
+      el.onload = () => resolve(true);
+      el.onerror = () => reject(new Error(`加载失败: ${src}`));
+      document.head.appendChild(el);
+    }));
+  }
+  return loaderCache.get(src);
+}
+
+function loadCss(href) {
+  if (document.querySelector(`link[href="${href}"]`)) return;
+  const link = document.createElement('link');
+  link.rel = 'stylesheet';
+  link.href = href;
+  document.head.appendChild(link);
+}
+
+/* ---------- Front Matter 解析（详情页兜底用） ---------- */
+/**
+ * 正常情况下 posts.json 已提供元数据；但如果你直接打开某个 md，
+ * 或者 posts.json 是旧的，就从前言里补一份。
+ */
+function parseFrontMatter(raw) {
+  const match = raw.match(/^\uFEFF?---\r?\n([\s\S]*?)\r?\n---\r?\n?/);
+  if (!match) return { data: {}, body: raw };
+
+  const data = {};
+  match[1].split(/\r?\n/).forEach((line) => {
+    const m = line.match(/^([A-Za-z0-9_-]+)\s*:\s*(.*)$/);
+    if (!m) return;
+    const key = m[1];
+    let value = m[2].trim();
+
+    if (/^\[.*\]$/.test(value)) {
+      // tags: ["a", "b"]
+      value = value.slice(1, -1).split(',')
+        .map((v) => v.trim().replace(/^['"]|['"]$/g, ''))
+        .filter(Boolean);
+    } else {
+      value = value.replace(/^['"]|['"]$/g, '');
+    }
+    data[key] = value;
+  });
+
+  return { data, body: raw.slice(match[0].length) };
+}
+
+/* ---------- 相对图片/链接修正 ---------- */
+// Markdown 里的 ./img/a.png 原本是相对 posts/ 目录的，渲染后要指回真实位置。
+function fixRelativeUrls(container) {
+  container.querySelectorAll('img[src], a[href]').forEach((node) => {
+    const attr = node.tagName === 'IMG' ? 'src' : 'href';
+    const value = node.getAttribute(attr);
+    if (!value) return;
+    // 跳过外链、锚点、绝对路径、data:
+    if (/^(https?:|mailto:|tel:|data:|#|\/)/i.test(value)) return;
+    node.setAttribute(attr, new URL(value, siteUrl('posts/')).href);
+  });
+
+  // 所有外链新窗口打开
+  container.querySelectorAll('a[href^="http"]').forEach((a) => {
+    a.setAttribute('target', '_blank');
+    a.setAttribute('rel', 'noopener noreferrer');
+  });
+}
+
+/* ---------- 目录（TOC） ---------- */
+function buildToc(container) {
+  if (!tocEl) return;
+
+  const headings = [...container.querySelectorAll('h2, h3')];
+  if (headings.length < 2) {
+    tocEl.hidden = true;
+    return;
+  }
+
+  const items = headings.map((h, index) => {
+    if (!h.id) {
+      h.id = `section-${index + 1}`;
+    }
+    return `<li class="toc__item toc__item--${h.tagName.toLowerCase()}">
+      <a href="#${escapeHtml(h.id)}">${escapeHtml(h.textContent)}</a>
+    </li>`;
+  }).join('');
+
+  tocEl.innerHTML = `<p class="toc__title">目录</p><ul class="toc__list">${items}</ul>`;
+  tocEl.hidden = false;
+}
+
+/* ---------- 上一篇 / 下一篇 ---------- */
+function renderPager(posts, currentId) {
+  if (!pagerEl) return;
+
+  const index = posts.findIndex((p) => p.id === currentId);
+  if (index === -1) {
+    pagerEl.innerHTML = '';
+    return;
+  }
+
+  // posts 已按日期倒序：index-1 是更新的一篇，index+1 是更早的一篇
+  const newer = posts[index - 1];
+  const older = posts[index + 1];
+
+  const link = (post, label) => {
+    if (!post) return `<span class="pager__link pager__link--disabled">${label}：没有了</span>`;
+    return `<a class="pager__link" href="${siteUrl('article.html')}?post=${encodeURIComponent(post.id)}">
+      ${label}：${escapeHtml(post.title)}
+    </a>`;
+  };
+
+  pagerEl.innerHTML = `
+    <div class="pager__col pager__col--prev">${link(newer, '上一篇')}</div>
+    <div class="pager__col pager__col--next">${link(older, '下一篇')}</div>
+  `;
+}
+
+/* ---------- 错误状态 ---------- */
+function showError(message, detail = '') {
+  if (!bodyEl) return;
+  bodyEl.innerHTML = `
+    <div class="notice notice--error">
+      <p><strong>${escapeHtml(message)}</strong></p>
+      ${detail ? `<p class="muted">${escapeHtml(detail)}</p>` : ''}
+      <p><a class="btn btn--primary" href="${siteUrl('index.html')}">返回文章列表</a></p>
+    </div>
+  `;
+  if (titleEl) titleEl.textContent = '出错了';
+  if (metaEl) metaEl.innerHTML = '';
+  if (tagsEl) tagsEl.innerHTML = '';
+  if (tocEl) tocEl.hidden = true;
+  if (pagerEl) pagerEl.innerHTML = '';
+}
+
+/* ---------- 主流程 ---------- */
+(async function boot() {
+  const params = new URLSearchParams(window.location.search);
+  const postId = (params.get('post') || '').trim();
+
+  if (!postId) {
+    showError('缺少文章参数', '请在地址后加上 ?post=文件名（不含 .md），例如 article.html?post=2026-08-19-hello');
+    return;
+  }
+
+  // 安全校验：只允许文件名，禁止路径穿越
+  if (!/^[\w\u4e00-\u9fa5.\-]+$/.test(postId)) {
+    showError('参数不合法', '文件名只能包含字母、数字、中文、点、横线或下划线。');
+    return;
+  }
+
+  const posts = await loadPosts();
+  const meta = await findPostById(postId);
+
+  // 读取 Markdown 源文件
+  let raw = '';
+  try {
+    const res = await fetch(siteUrl(`posts/${postId}.md`), { cache: 'no-cache' });
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    raw = await res.text();
+  } catch (err) {
+    showError('找不到这篇文章', `posts/${postId}.md 不存在或无法读取。`);
+    return;
+  }
+
+  const { data: fm, body: markdown } = parseFrontMatter(raw);
+
+  // 合并元数据：优先 posts.json，其次 Front Matter
+  const post = {
+    id: postId,
+    title: meta?.title || fm.title || postId,
+    date: meta?.date || fm.date || '',
+    tags: meta?.tags || (Array.isArray(fm.tags) ? fm.tags : (fm.tags ? [fm.tags] : [])),
+    summary: meta?.summary || fm.summary || ''
+  };
+
+  /* --- 头部 --- */
+  document.title = `${post.title} · ${window.SITE_CONFIG?.siteTitle || ''}`;
+  const descMeta = document.querySelector('meta[name="description"]');
+  if (descMeta && post.summary) descMeta.setAttribute('content', post.summary);
+
+  if (titleEl) titleEl.textContent = post.title;
+  if (crumbEl) {
+    crumbEl.innerHTML = `<a href="${siteUrl('index.html')}">首页</a> / <span>${escapeHtml(post.title)}</span>`;
+  }
+  if (metaEl) {
+    metaEl.innerHTML = `<time datetime="${escapeHtml(post.date)}">${escapeHtml(formatDate(post.date))}</time>`;
+  }
+  if (tagsEl) {
+    tagsEl.innerHTML = post.tags
+      .map((t) => `<a class="tag" href="${siteUrl('tags.html')}#${encodeURIComponent(t)}">${escapeHtml(t)}</a>`)
+      .join('');
+  }
+
+  /* --- 渲染 Markdown --- */
+  let html = '';
+
+  try {
+    await loadScript(CDN.marked);
+
+    if (!window.marked) throw new Error('marked 未就绪');
+
+    // 配置 marked：gfm + 换行转 <br>
+    window.marked.setOptions({ gfm: true, breaks: true });
+
+    html = window.marked.parse(markdown);
+  } catch (err) {
+    console.error('[marked] 渲染失败，降级为 <pre> 显示原文', err);
+    html = `<pre class="markdown-fallback">${escapeHtml(markdown)}</pre>`;
+  }
+
+  // 可选：DOMPurify 清洗（加载失败就跳过，不阻断阅读）
+  try {
+    await loadScript(CDN.purify);
+    if (window.DOMPurify) {
+      html = window.DOMPurify.sanitize(html, { ADD_ATTR: ['target'] });
+    }
+  } catch {
+    console.warn('[purify] 未加载，跳过 HTML 清洗');
+  }
+
+  if (bodyEl) {
+    bodyEl.innerHTML = html;
+    fixRelativeUrls(bodyEl);
+    buildToc(bodyEl);
+  }
+
+  /* --- 代码高亮（可选） --- */
+  try {
+    await loadScript(CDN.highlightJs);
+    loadCss(CDN.highlightCss);
+    if (window.hljs && bodyEl) {
+      bodyEl.querySelectorAll('pre code').forEach((block) => {
+        window.hljs.highlightElement(block);
+      });
+    }
+  } catch {
+    console.warn('[highlight.js] 未加载，代码块保持无高亮');
+  }
+
+  /* --- 上一篇 / 下一篇 --- */
+  renderPager(posts, postId);
+
+  /* --- 评论 --- */
+  mountGiscus(postId);
+})();

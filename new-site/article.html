@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>文章 · LEA聊天记录大赏</title>
+  <meta name="description" content="LEA聊天记录大赏文章详情页。">
+  <meta name="author" content="Majesticrise">
+  <link rel="alternate" type="application/rss+xml" title="LEA聊天记录大赏" href="feed.xml">
+  <link rel="stylesheet" href="assets/css/style.css">
+</head>
+<body>
+  <div id="site-header"></div>
+
+  <main class="site-main" id="main">
+    <div class="container">
+      <div class="article">
+
+        <header class="article-header">
+          <p class="breadcrumb" id="article-crumb"></p>
+          <h1 class="article-title" id="article-title">加载中…</h1>
+          <p class="article-meta" id="article-meta"></p>
+          <div class="article-tags" id="article-tags"></div>
+        </header>
+
+        <!-- 目录（标题数量不足时自动隐藏） -->
+        <nav class="article-toc" id="article-toc" aria-label="文章目录" hidden></nav>
+
+        <!-- Markdown 渲染结果 -->
+        <div class="article-body" id="article-body">
+          <p class="empty-state">正在读取文章…</p>
+        </div>
+
+        <!-- 上一篇 / 下一篇 -->
+        <nav class="article-pager" id="article-pager" aria-label="文章导航"></nav>
+
+        <!-- giscus 评论（默认关闭，见 assets/js/site-config.js） -->
+        <section class="comments-wrap" id="comments-wrap">
+          <h2 class="comments-title">评论</h2>
+          <div id="comments"></div>
+        </section>
+
+      </div>
+    </div>
+  </main>
+
+  <div id="site-footer"></div>
+
+  <script src="assets/js/site-config.js"></script>
+  <script type="module" src="assets/js/article.js"></script>
+</body>
+</html>

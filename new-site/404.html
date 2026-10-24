@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>页面不存在 · LEA聊天记录大赏</title>
+  <meta name="robots" content="noindex">
+
+  <!--
+    ============================================================
+    404 页面的特殊性：
+    GitHub Pages 会在任意深度的 URL 上返回本文件，例如
+    /repo/new-site/a/b/c，此时相对路径 "../../" 无法指向站点根。
+    因此这里用一段内联脚本，向上试探目录，找到含
+    assets/css/style.css 的那一层，作为"站点根"。
+    这样既不写死 new-site，也不写死仓库名。
+    ============================================================
+  -->
+  <script>
+    (function () {
+      // 由当前 URL 逐级向上生成候选根目录
+      var segments = location.pathname.split('/').filter(Boolean);
+      var candidates = [];
+      for (var i = segments.length; i >= 0; i--) {
+        var p = '/' + segments.slice(0, i).join('/');
+        candidates.push((p === '/' ? '' : p) + '/');
+      }
+
+      // 依次探测，找到第一个真实存在的 style.css
+      function probe(index) {
+        if (index >= candidates.length) {
+          apply('./'); // 全部失败时退回相对路径
+          return;
+        }
+        var root = candidates[index];
+        fetch(root + 'assets/css/style.css', { method: 'HEAD' })
+          .then(function (res) {
+            if (res.ok) { apply(root); } else { probe(index + 1); }
+          })
+          .catch(function () { probe(index + 1); });
+      }
+
+      function apply(root) {
+        window.__SITE_ROOT__ = root;
+
+        // 注入样式
+        var link = document.createElement('link');
+        link.rel = 'stylesheet';
+        link.href = root + 'assets/css/style.css';
+        document.head.appendChild(link);
+
+        // 修正页面里所有 data-site-href 链接，并加载公共模块
+        document.addEventListener('DOMContentLoaded', function () {
+          document.querySelectorAll('[data-site-href]').forEach(function (el) {
+            el.setAttribute('href', root + el.getAttribute('data-site-href'));
+          });
+          import(root + 'assets/js/page-init.js').catch(function (err) {
+            console.warn('[404] 初始化模块加载失败', err);
+          });
+        });
+      }
+
+      probe(0);
+    })();
+  </script>
+</head>
+<body>
+  <div id="site-header"></div>
+
+  <main class="site-main" id="main">
+    <div class="container">
+      <section class="error-page">
+        <p class="error-code">404</p>
+        <h1 class="error-title">这个页面不见了</h1>
+        <p class="error-desc">
+          可能是链接过期、文章被移动，或者地址敲错了一个字符。
+        </p>
+        <div class="error-links">
+          <a class="btn btn--primary" data-site-href="index.html" href="index.html">回到首页</a>
+          <a class="btn btn--ghost" data-site-href="tags.html" href="tags.html">按标签浏览</a>
+          <a class="btn btn--ghost" data-site-href="resources.html" href="resources.html">资源页</a>
+        </div>
+      </section>
+
+      <p class="muted text-center" style="margin-top:40px">
+        如果是通过文章链接进入，请确认链接形如
+        <code>article.html?post=2026-08-19-hello</code>。
+      </p>
+    </div>
+  </main>
+
+  <div id="site-footer"></div>
+</body>
+</html>
