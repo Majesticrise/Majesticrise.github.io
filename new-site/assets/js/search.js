@@ -30,6 +30,23 @@ export function initGlobalSearch(selector) {
   loadPosts().then((list) => { posts = list; });
 
   let timer = null;
+  // 回车：跳到首页全文搜索结果
+  input.addEventListener('keydown', (event) => {
+    if (event.key === 'Enter') {
+      const kw = input.value.trim();
+      if (kw) {
+        window.location.href = `${new URL('index.html', document.baseURI).href}?q=${encodeURIComponent(kw)}`;
+      }
+    } else if (event.key === 'Escape') {
+      results.hidden = true;
+    }
+  });
+
+  // 点击页面其他位置收起下拉
+  document.addEventListener('click', (event) => {
+    if (!mount.contains(event.target)) results.hidden = true;
+  });
+
   input.addEventListener('input', () => {
     clearTimeout(timer);
     timer = setTimeout(() => {

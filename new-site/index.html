@@ -34,43 +34,53 @@
   <div id="site-header"></div>
 
   <main class="site-main" id="main">
-    <div class="container">
+    <div class="container container--wide">
 
       <h1 class="page-title">最新文章</h1>
       <p class="page-lead">群聊存档、Minecraft 技术笔记、梗与一些乱七八糟的杂谈。</p>
 
-      <!-- 首页小部件：现在时间 / 高考倒计时
-           文案与目标日期在 assets/js/site-config.js 的 homeWidgets 里改 -->
+      <!-- 首页小部件：现在时间 / 高考倒计时（扁平样式，居中横排） -->
       <div class="home-widgets" id="home-widgets">
         <div class="home-widget" id="widget-time" hidden>
           <div class="home-widget__label">现在时间</div>
           <div class="home-widget__value" id="home-time-value">--</div>
         </div>
         <div class="home-widget home-widget--countdown" id="widget-countdown" hidden>
-          <div class="home-widget__label">倒计时</div>
+          <div class="home-widget__label">⏳ 2029年高考倒计时</div>
           <div class="home-widget__value" id="home-countdown-value">计算中…</div>
         </div>
       </div>
 
-      <!-- 站内搜索：基于 posts.json 的标题 / 摘要 / 标签 -->
-      <div class="search-bar">
-        <input
-          type="search"
-          id="search-input"
-          class="search-input"
-          placeholder="搜索标题、摘要或标签…"
-          aria-label="站内搜索">
-      </div>
-      <p class="search-hint" id="search-hint" role="status" aria-live="polite"></p>
+      <div class="home-layout">
+        <!-- 左侧栏：合集入口（内容在 site-config.js 维护） -->
+        <aside class="home-side">
+          <!-- 系列入口卡片由 main.js 依据 site-config.js 的 series 渲染 -->
+          <div class="series-cards" id="series-cards" hidden></div>
+        </aside>
 
-      <!-- 文章列表由 assets/js/main.js 渲染 -->
-      <div class="post-list" id="post-list">
-        <p class="empty-state">正在加载文章…</p>
-      </div>
+        <!-- 右侧：搜索 + 文章列表 -->
+        <div class="home-main">
+          <!-- 站内搜索：基于 posts.json 的标题 / 摘要 / 标签 / 正文 -->
+          <div class="search-bar">
+            <input
+              type="search"
+              id="search-input"
+              class="search-input"
+              placeholder="搜索标题、摘要、标签或正文…"
+              aria-label="站内搜索">
+          </div>
+          <p class="search-hint" id="search-hint" role="status" aria-live="polite"></p>
 
-      <div class="load-more-wrap">
-        <button class="btn btn--primary" id="load-more" type="button" hidden>加载更多</button>
-        <p class="list-status" id="list-status"></p>
+          <!-- 文章列表由 assets/js/main.js 渲染 -->
+          <div class="post-list" id="post-list">
+            <p class="empty-state">正在加载文章…</p>
+          </div>
+
+          <div class="load-more-wrap">
+            <button class="btn btn--primary" id="load-more" type="button" hidden>加载更多</button>
+            <p class="list-status" id="list-status"></p>
+          </div>
+        </div>
       </div>
 
     </div>

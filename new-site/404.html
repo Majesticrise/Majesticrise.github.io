@@ -61,15 +61,32 @@
         favicon.href = root + 'assets/img/avatar-icon.png';
         document.head.appendChild(favicon);
 
-        // 修正页面里所有 data-site-href 链接，并加载公共模块
-        document.addEventListener('DOMContentLoaded', function () {
+        // 修正页面里所有 data-site-href 链接，并加载公共模块。
+        // 注意：探测是异步的，执行到这里时 DOMContentLoaded 往往已经触发过，
+        // 事件监听将永远不会执行——所以必须按 readyState 分支立即执行。
+        function fixAndInit() {
           document.querySelectorAll('[data-site-href]').forEach(function (el) {
             el.setAttribute('href', root + el.getAttribute('data-site-href'));
           });
-          import(root + 'assets/js/page-init.js').catch(function (err) {
-            console.warn('[404] 初始化模块加载失败', err);
-          });
-        });
+          // 先加载站点配置（导航/页脚数据），完成后再加载公共模块
+          var cfg = document.createElement('script');
+          cfg.src = root + 'assets/js/site-config.js';
+          cfg.onload = function () {
+            import(root + 'assets/js/page-init.js').catch(function (err) {
+              console.warn('[404] 初始化模块加载失败', err);
+            });
+          };
+          cfg.onerror = function () {
+            console.warn('[404] site-config.js 加载失败');
+          };
+          document.head.appendChild(cfg);
+        }
+
+        if (document.readyState === 'loading') {
+          document.addEventListener('DOMContentLoaded', fixAndInit);
+        } else {
+          fixAndInit();
+        }
       }
 
       probe(0);

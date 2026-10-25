@@ -1,7 +1,7 @@
 ---
 title: "Majesticrise：技术整活人的赛博剧场"
 date: 2026-08-05
-tags: []
+tags: ["人物"]
 summary: "从代码到女装照，一个用键盘写诗的乐子人 在 LEA 公会这个数字部落里，Majesticrise 是最难被定义的那一个。他既不像 XiaoHui_ 那样忧郁疏离…"
 gate: true
 ---

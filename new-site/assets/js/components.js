@@ -225,12 +225,21 @@ function renderHeader() {
           <ul class="nav-list">${navHtml}</ul>
         </nav>
 
+        <div id="global-search" class="header-search"></div>
+
         <button class="theme-toggle" type="button" aria-label="切换深浅色主题" title="切换深浅色主题">🌙</button>
       </div>
     </header>
   `;
 
   setupNavInteractions(mount);
+
+  // 导航栏全局搜索（快速跳转；实现见 search.js，开关见 site-config.js）
+  if (config.globalSearch && document.getElementById('global-search')) {
+    import('./search.js')
+      .then((mod) => mod.initGlobalSearch('#global-search'))
+      .catch((err) => console.warn('[search] 全局搜索初始化失败', err));
+  }
 }
 
 /* ---------- 主题切换（深浅色，localStorage 记忆，页面内联脚本负责启动前恢复） ---------- */

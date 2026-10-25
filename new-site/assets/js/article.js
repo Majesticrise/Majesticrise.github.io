@@ -89,6 +89,8 @@ async function renderMermaidBlocks(container) {
     window.mermaid.initialize({
       startOnLoad: false,
       securityLevel: 'strict',
+      // 解析失败时抛异常（而不是渲染"语法错误"炸弹 SVG），由下面的 catch 回退为源码
+      suppressErrorRendering: true,
       theme: isDark ? 'dark' : 'default'
     });
 
@@ -99,11 +101,16 @@ async function renderMermaidBlocks(container) {
       div.className = 'mermaid';
       div.textContent = code.textContent;
       pre.replaceWith(div);
+      let failed = false;
       try {
         await window.mermaid.run({ nodes: [div] });
       } catch (err) {
-        // 语法错误时回退为源码展示，不让整页挂掉
-        console.warn('[mermaid] 图表渲染失败，保留源码展示', err);
+        failed = true;
+      }
+      // 双保险：若 mermaid 仍然画出了"语法错误"炸弹图，同样回退为源码
+      if (!failed && div.querySelector('.error-icon, .error-text')) failed = true;
+      if (failed) {
+        console.warn('[mermaid] 图表渲染失败，保留源码展示');
         const preFallback = document.createElement('pre');
         const codeFallback = document.createElement('code');
         codeFallback.className = 'language-mermaid';
@@ -199,6 +206,34 @@ function buildToc(container) {
 
   tocEl.innerHTML = `<p class="toc__title">目录</p><ul class="toc__list">${items}</ul>`;
   tocEl.hidden = false;
+  setupScrollSpy(headings);
+}
+
+/* ---------- 目录滚动高亮（scrollspy） ---------- */
+function setupScrollSpy(headings) {
+  if (!headings.length || !('IntersectionObserver' in window)) return;
+
+  const links = new Map();
+  tocEl.querySelectorAll('a[href^="#"]').forEach((a) => {
+    links.set(decodeURIComponent(a.getAttribute('href').slice(1)), a.parentElement);
+  });
+
+  let current = '';
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach((entry) => {
+      if (!entry.isIntersecting) return;
+      const id = entry.target.id;
+      if (id === current || !links.has(id)) return;
+      current = id;
+      links.forEach((li) => li.classList.remove('is-active'));
+      links.get(id)?.classList.add('is-active');
+      // 侧边目录较长时让高亮项保持在可视区内
+      const active = links.get(id);
+      active?.scrollIntoView({ block: 'nearest' });
+    });
+  }, { rootMargin: '-72px 0px -70% 0px', threshold: 0 });
+
+  headings.forEach((h) => observer.observe(h));
 }
 
 /* ---------- 上一篇 / 下一篇 ---------- */
@@ -300,6 +335,10 @@ function showError(message, detail = '') {
     .replace(/\s+/g, '')
     .length;
   const readMinutes = Math.max(1, Math.round(plainLength / 400));
+  // 超过 60 分钟的（多为聊天记录存档）改显示字数，比“阅读 554 分钟”更有意义
+  const readLabel = readMinutes > 60
+    ? ('约 ' + (plainLength / 10000).toFixed(1) + ' 万字')
+    : ('预计阅读 ' + readMinutes + ' 分钟');
 
   // 合并元数据：优先 posts.json，其次 Front Matter
   const post = {
@@ -323,7 +362,7 @@ function showError(message, detail = '') {
     metaEl.innerHTML =
       `<time datetime="${escapeHtml(post.date)}">${escapeHtml(formatDate(post.date))}</time>` +
       `<span class="meta-sep" aria-hidden="true"> · </span>` +
-      `<span class="read-minutes">预计阅读 ${readMinutes} 分钟</span>`;
+      `<span class="read-minutes">${readLabel}</span>`;
   }
   if (tagsEl) {
     tagsEl.innerHTML = post.tags

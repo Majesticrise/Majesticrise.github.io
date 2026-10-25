@@ -944,17 +944,18 @@ li + li { margin-top: 0.3em; }
 .home-widgets {
   display: flex;
   flex-wrap: wrap;
-  gap: 16px;
-  margin: 0 0 28px;
+  justify-content: center;
+  align-items: flex-start;
+  gap: 14px 72px;
+  margin: 0 0 30px;
 }
 
+/* 扁平样式：无卡片边框，居中横排 */
 .home-widget {
-  flex: 1 1 260px;
-  padding: 16px 20px;
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-lg);
-  background: linear-gradient(135deg, rgba(28, 111, 214, 0.07), rgba(28, 111, 214, 0.02));
-  box-shadow: var(--shadow-sm);
+  padding: 0;
+  border: none;
+  background: none;
+  box-shadow: none;
   text-align: center;
 }
 
@@ -973,11 +974,7 @@ li + li { margin-top: 0.3em; }
   font-variant-numeric: tabular-nums; /* 数字等宽，秒数跳动不抖动 */
 }
 
-/* 倒计时卡片：红色强调 */
-.home-widget--countdown {
-  background: linear-gradient(135deg, rgba(192, 57, 43, 0.07), rgba(192, 57, 43, 0.02));
-}
-
+/* 倒计时：红色强调 */
 .home-widget--countdown .home-widget__value {
   color: var(--color-danger);
 }
@@ -1197,4 +1194,186 @@ pre:hover .code-copy-btn,
 @media (max-width: 640px) {
   .archive-item { flex-wrap: wrap; }
   .archive-item__tags { margin-left: 0; }
+}
+
+/* ---------------- 22. 系列入口卡片 / 导航搜索 / 侧边目录 ---------------- */
+
+/* 系列入口卡片 */
+.series-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 14px;
+  margin: 0 0 24px;
+}
+
+.series-card {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 16px 18px;
+  background: var(--color-bg-soft);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  text-decoration: none;
+  transition: var(--transition);
+}
+
+.series-card:hover {
+  border-color: var(--color-link);
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
+}
+
+.series-card__name {
+  font-weight: 700;
+  color: var(--color-link);
+}
+
+.series-card__desc {
+  font-size: 0.88rem;
+  color: var(--color-text-soft);
+  line-height: 1.6;
+}
+
+.series-card__meta {
+  font-size: 0.78rem;
+  color: var(--color-text-muted);
+  margin-top: auto;
+}
+
+/* 导航栏全局搜索 */
+.site-header .container {
+  max-width: 1080px; /* 导航 + 搜索框并排放下 */
+}
+
+.brand__title,
+.brand__subtitle {
+  white-space: nowrap;
+}
+
+.nav-list .nav-link,
+.nav-list .dropdown-toggle {
+  white-space: nowrap; /* 防止被搜索框挤压换行 */
+}
+
+.header-search {
+  flex: 0 1 210px;
+  min-width: 150px;
+}
+
+@media (max-width: 991px) {
+  .header-search { display: none; } /* 移动端用首页搜索 */
+}
+
+.global-search { position: relative; }
+
+.global-search__input {
+  width: 100%;
+  padding: 7px 13px;
+  font-size: 0.85rem;
+  border: 1px solid var(--color-border);
+  border-radius: 999px;
+  background: var(--color-bg-soft);
+  color: var(--color-text);
+}
+
+.global-search__input:focus {
+  outline: none;
+  border-color: var(--color-link);
+  background: var(--color-bg);
+}
+
+.global-search__results {
+  position: absolute;
+  top: calc(100% + 6px);
+  right: 0;
+  width: 330px;
+  max-height: 60vh;
+  overflow-y: auto;
+  margin: 0;
+  padding: 6px;
+  list-style: none;
+  background: var(--color-bg);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-md);
+  z-index: 60;
+}
+
+.global-search__results a {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 10px;
+  padding: 8px 10px;
+  border-radius: var(--radius-sm);
+  text-decoration: none;
+  color: var(--color-text);
+}
+
+.global-search__results a:hover {
+  background: var(--color-bg-muted);
+}
+
+.global-search__title { font-size: 0.88rem; }
+.global-search__date { font-size: 0.75rem; color: var(--color-text-muted); flex: 0 0 auto; }
+.global-search__empty { padding: 8px 10px; font-size: 0.85rem; color: var(--color-text-muted); }
+
+/* 目录滚动高亮 */
+.toc__item.is-active > a {
+  color: var(--color-link);
+  font-weight: 600;
+}
+
+/* 宽屏：目录固定为右侧边栏（内容列 880px 居中，1440px 起右侧空间足够） */
+@media (min-width: 1440px) {
+  .article-toc {
+    position: fixed;
+    top: calc(var(--header-height) + 20px);
+    right: 24px;
+    width: 250px;
+    max-height: calc(100vh - var(--header-height) - 40px);
+    overflow-y: auto;
+    z-index: 5;
+  }
+}
+
+/* ---------------- 23. 首页两栏布局（左合集 / 右文章） ---------------- */
+
+.container--wide {
+  max-width: 1180px;
+}
+
+.home-layout {
+  display: grid;
+  grid-template-columns: 290px minmax(0, 1fr);
+  gap: 32px;
+  align-items: start;
+}
+
+/* 左侧栏：滚动时跟随 */
+.home-side {
+  position: sticky;
+  top: calc(var(--header-height) + 20px);
+  display: flex;
+  flex-direction: column;
+  gap: 22px;
+}
+
+/* 侧栏里的合集改单列 */
+.home-side .series-cards {
+  grid-template-columns: 1fr;
+  margin: 0;
+}
+
+@media (max-width: 991px) {
+  .home-layout { display: block; }
+  .home-side {
+    position: static;
+    margin-bottom: 28px;
+  }
+  .home-side .series-cards {
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    margin-bottom: 4px;
+  }
 }

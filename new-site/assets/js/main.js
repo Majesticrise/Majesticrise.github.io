@@ -152,6 +152,37 @@ if (initialQuery && searchInput) searchInput.value = initialQuery;
 // 支持 ?tag=标签 直接过滤
 const initialTag = params.get('tag') || '';
 
+/* ---------- 系列入口卡片（配置见 site-config.js 的 series） ---------- */
+function renderSeriesCards() {
+  const mount = document.getElementById('series-cards');
+  const series = config.series || [];
+  window.__dbg = { called: true, mount: !!mount, seriesLen: series.length, allLen: state.all.length, sampleId: state.all[0]?.id };
+  if (!mount || !series.length) return;
+
+  const cards = series.map((item) => {
+    const posts = item.ids
+      .map((id) => state.all.find((p) => p.id === id))
+      .filter(Boolean);
+    if (!posts.length) return ''; // 系列内文章暂未发布则不显示
+    const dates = posts.map((p) => p.date).sort();
+    const start = dates[0];
+    const end = dates[dates.length - 1];
+    const range = start === end ? start : `${start} ~ ${end}`;
+    const href = `${siteUrl('article.html')}?post=${encodeURIComponent(posts[0].id)}`;
+    return `
+      <a class="series-card" href="${href}">
+        <span class="series-card__name">${escapeHtml(item.title)}</span>
+        <span class="series-card__desc">${escapeHtml(item.desc)}</span>
+        <span class="series-card__meta">${posts.length} 篇 · ${escapeHtml(range)} · 从头读 →</span>
+      </a>`;
+  });
+
+  if (cards.some(Boolean)) {
+    mount.innerHTML = cards.join('');
+    mount.hidden = false;
+  }
+}
+
 /* ---------- 首页小部件：现在时间 / 高考倒计时 ----------
  * 文案与目标日期在 site-config.js 的 homeWidgets 中配置。
  */
@@ -175,7 +206,7 @@ function initHomeWidgets() {
     const updateTime = () => {
       const now = new Date();
       valueEl.textContent =
-        `${now.getFullYear()}年${now.getMonth() + 1}月${now.getDate()}日 ` +
+        `${now.getFullYear()}.${pad(now.getMonth() + 1)}.${pad(now.getDate())} ` +
         `${pad(now.getHours())}:${pad(now.getMinutes())}:${pad(now.getSeconds())}（${week[now.getDay()]}）`;
     };
     updateTime();
@@ -222,6 +253,7 @@ function initHomeWidgets() {
   initHomeWidgets();
 
   state.all = await loadPosts();
+  renderSeriesCards();
 
   if (initialTag) {
     state.all = state.all.filter((p) =>

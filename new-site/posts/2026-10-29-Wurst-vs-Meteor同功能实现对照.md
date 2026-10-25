@@ -1,7 +1,7 @@
 ---
 title: "Wurst vs Meteor：同功能实现对照"
 date: 2026-10-29
-tags: ["Minecraft", "技术", "Wurst7", "Meteor"]
+tags: ["Minecraft", "技术"]
 summary: "以同一组功能为坐标，对照 Wurst7 与 Meteor 两个开源客户端的实现差异：架构取舍、事件模型、渲染与网络层。"
 ---
 
