@@ -4,7 +4,7 @@
  * ============================================================ */
 
 import {
-  initLayout, loadPosts, aggregateTags, postCardHtml, emptyStateHtml, escapeHtml
+  initLayout, loadPosts, aggregateTags, postCardHtml, emptyStateHtml, escapeHtml, tagAccentClass
 } from './components.js';
 
 initLayout();
@@ -28,7 +28,7 @@ function renderCloud(tags) {
 
   cloudEl.innerHTML = tags.map(({ name, count }) => {
     const isActive = name === activeTag;
-    return `<button class="tag tag--button${isActive ? ' is-active' : ''}"
+    return `<button class="tag ${tagAccentClass(name)} tag--button${isActive ? ' is-active' : ''}"
               type="button"
               data-tag="${escapeHtml(name)}"
               aria-pressed="${isActive}">

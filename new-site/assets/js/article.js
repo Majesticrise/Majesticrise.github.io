@@ -10,7 +10,7 @@
 
 import {
   initLayout, loadPosts, findPostById, siteUrl, escapeHtml, formatDate, mountGiscus, enableLightbox,
-  requestGatePass, addCopyButtons
+  requestGatePass, addCopyButtons, tagAccentClass, vtNameFor
 } from './components.js';
 
 initLayout();
@@ -185,6 +185,22 @@ function fixRelativeUrls(container) {
   });
 }
 
+/* ---------- 图片 figure 化：统一圆角/间距 + 图序说明 ---------- */
+function wrapPostImages(container) {
+  let index = 0;
+  container.querySelectorAll('img').forEach((img) => {
+    if (img.closest('figure')) return;
+    index += 1;
+    const fig = document.createElement('figure');
+    fig.className = 'post-figure';
+    const caption = document.createElement('figcaption');
+    caption.textContent = `图 ${index}`;
+    img.replaceWith(fig);
+    fig.appendChild(img);
+    fig.appendChild(caption);
+  });
+}
+
 /* ---------- 目录（TOC） ---------- */
 function buildToc(container) {
   if (!tocEl) return;
@@ -354,7 +370,11 @@ function showError(message, detail = '') {
   const descMeta = document.querySelector('meta[name="description"]');
   if (descMeta && post.summary) descMeta.setAttribute('content', post.summary);
 
-  if (titleEl) titleEl.textContent = post.title;
+  if (titleEl) {
+    titleEl.textContent = post.title;
+    // 与列表页标题配对：点进来时标题会平滑"飞"到位（View Transitions）
+    titleEl.style.viewTransitionName = vtNameFor(postId);
+  }
   if (crumbEl) {
     crumbEl.innerHTML = `<a href="${siteUrl('index.html')}">首页</a> / <span>${escapeHtml(post.title)}</span>`;
   }
@@ -366,7 +386,7 @@ function showError(message, detail = '') {
   }
   if (tagsEl) {
     tagsEl.innerHTML = post.tags
-      .map((t) => `<a class="tag" href="${siteUrl('tags.html')}#${encodeURIComponent(t)}">${escapeHtml(t)}</a>`)
+      .map((t) => `<a class="tag ${tagAccentClass(t)}" href="${siteUrl('tags.html')}#${encodeURIComponent(t)}">${escapeHtml(t)}</a>`)
       .join('');
   }
 
@@ -400,6 +420,7 @@ function showError(message, detail = '') {
   if (bodyEl) {
     bodyEl.innerHTML = html;
     fixRelativeUrls(bodyEl);
+    wrapPostImages(bodyEl); // 图片统一 figure 样式 + 图序说明
     buildToc(bodyEl);
     enableLightbox(bodyEl); // 点击图片放大查看（聊天截图刚需）
   }

@@ -42,8 +42,8 @@
    切换按钮见导航栏，逻辑在 components.js，记忆在 localStorage（lea:theme）。 */
 :root[data-theme="dark"] {
   --color-bg: #16181c;
-  --color-bg-soft: #1d2025;
-  --color-bg-muted: #24282e;
+  --color-bg-soft: #23272e;
+  --color-bg-muted: #2b3038;
   --color-text: #e4e6ea;
   --color-text-soft: #b6bcc6;
   --color-text-muted: #8b929c;
@@ -58,8 +58,8 @@
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) {
     --color-bg: #16181c;
-    --color-bg-soft: #1d2025;
-    --color-bg-muted: #24282e;
+    --color-bg-soft: #23272e;
+    --color-bg-muted: #2b3038;
     --color-text: #e4e6ea;
     --color-text-soft: #b6bcc6;
     --color-text-muted: #8b929c;
@@ -229,8 +229,28 @@ li + li { margin-top: 0.3em; }
 
 .brand {
   display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.brand__avatar {
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  border: 1px solid var(--color-border);
+  flex: 0 0 auto;
+}
+
+.brand__text {
+  display: flex;
   flex-direction: column;
-  justify-content: center;
+}
+
+.brand {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 10px;
   color: var(--color-text);
   text-decoration: none;
   line-height: 1.25;
@@ -530,6 +550,12 @@ li + li { margin-top: 0.3em; }
   color: var(--color-text-muted);
   font-size: 0.85rem;
   text-align: center;
+}
+
+/* ---------------- 9. 文章详情 ---------------- */
+.article {
+  max-width: 760px; /* 中文正文行宽控制在 40 字左右 */
+  margin: 0 auto;
 }
 
 /* ---------------- 9. 文章详情 ---------------- */
@@ -1016,6 +1042,19 @@ li + li { margin-top: 0.3em; }
   background: var(--color-bg-muted);
 }
 
+.theme-toggle svg {
+  display: block;
+}
+
+@keyframes theme-pop {
+  0% { transform: rotate(-120deg) scale(0.4); opacity: 0; }
+  100% { transform: rotate(0deg) scale(1); opacity: 1; }
+}
+
+.theme-toggle--pop svg {
+  animation: theme-pop 380ms ease;
+}
+
 /* 回到顶部按钮 */
 .back-to-top {
   position: fixed;
@@ -1135,6 +1174,34 @@ pre:hover .code-copy-btn,
   height: auto;
 }
 
+/* ---------------- 20.5 标签分类配色 ---------------- */
+.tag--tech {
+  border-color: rgba(59, 130, 196, 0.5);
+  background: rgba(59, 130, 196, 0.1);
+}
+
+.tag--tech:hover {
+  border-color: rgba(59, 130, 196, 0.9);
+}
+
+.tag--chat {
+  border-color: rgba(154, 111, 208, 0.5);
+  background: rgba(154, 111, 208, 0.1);
+}
+
+.tag--chat:hover {
+  border-color: rgba(154, 111, 208, 0.9);
+}
+
+.tag--person {
+  border-color: rgba(46, 158, 107, 0.5);
+  background: rgba(46, 158, 107, 0.1);
+}
+
+.tag--person:hover {
+  border-color: rgba(46, 158, 107, 0.9);
+}
+
 /* ---------------- 21. 归档页 ---------------- */
 
 .archive-year {
@@ -1194,6 +1261,26 @@ pre:hover .code-copy-btn,
 @media (max-width: 640px) {
   .archive-item { flex-wrap: wrap; }
   .archive-item__tags { margin-left: 0; }
+}
+
+/* ---------------- 21.5 文章图片 figure 样式 ---------------- */
+.post-figure {
+  margin: 24px 0;
+  text-align: center;
+}
+
+.post-figure img {
+  display: block;
+  max-width: 100%;
+  margin: 0 auto;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--color-border);
+}
+
+.post-figure figcaption {
+  margin-top: 8px;
+  font-size: 0.82rem;
+  color: var(--color-text-muted);
 }
 
 /* ---------------- 22. 系列入口卡片 / 导航搜索 / 侧边目录 ---------------- */
@@ -1376,4 +1463,166 @@ pre:hover .code-copy-btn,
     grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
     margin-bottom: 4px;
   }
+}
+
+/* ---------------- 24. 页面切换过渡动画 ---------------- */
+
+/* 跨文档视图过渡：同源页面间导航时，浏览器自动做平滑过渡
+   （Chrome/Edge 126+ 支持；Firefox/Safari 自动降级为直接切换，无副作用） */
+@view-transition {
+  navigation: auto;
+}
+
+/* 自定义过渡效果：旧页淡出，新页轻微上浮淡入 */
+@keyframes vt-page-out {
+  to { opacity: 0; }
+}
+
+@keyframes vt-page-in {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: none; }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  ::view-transition-old(root) {
+    animation: vt-page-out 180ms ease both;
+  }
+
+  ::view-transition-new(root) {
+    animation: vt-page-in 280ms ease both;
+  }
+}
+
+/* 降级方案：不支持视图过渡的浏览器，页面内容载入时做一次轻微淡入 */
+@media (prefers-reduced-motion: no-preference) {
+  .site-main {
+    animation: page-in 240ms ease both;
+  }
+}
+
+@keyframes page-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+/* ---------------- 25. 炫技层：滚动渐入 / 命令面板 / 卡片倾斜 ---------------- */
+
+/* 滚动渐入：纯 CSS scroll-driven animations（不支持的浏览器全部直接可见） */
+@supports (animation-timeline: view()) {
+  @media (prefers-reduced-motion: no-preference) {
+    .article-body > *,
+    .post-card {
+      animation: reveal-up linear both;
+      animation-timeline: view();
+      animation-range: entry 0% entry 45%;
+    }
+  }
+}
+
+@keyframes reveal-up {
+  from { opacity: 0; transform: translateY(18px); }
+  to { opacity: 1; transform: none; }
+}
+
+/* 合集卡片 3D 倾斜 */
+.series-cards {
+  perspective: 900px;
+}
+
+.series-card {
+  will-change: transform;
+  transform-style: preserve-3d;
+}
+
+/* Ctrl+K 命令面板 */
+.palette-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 200;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  padding: 12vh 16px 16px;
+  background: rgba(0, 0, 0, 0.55);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 160ms ease;
+}
+
+.palette-overlay.is-open {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.palette-panel {
+  width: min(600px, 100%);
+  background: var(--color-bg);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  box-shadow: 0 16px 60px rgba(0, 0, 0, 0.45);
+  overflow: hidden;
+  transform: translateY(-8px);
+  transition: transform 160ms ease;
+}
+
+.palette-overlay.is-open .palette-panel {
+  transform: none;
+}
+
+.palette-input {
+  width: 100%;
+  padding: 15px 18px;
+  font-size: 1rem;
+  color: var(--color-text);
+  background: transparent;
+  border: none;
+  border-bottom: 1px solid var(--color-border);
+  outline: none;
+}
+
+.palette-results {
+  list-style: none;
+  margin: 0;
+  padding: 8px;
+  max-height: 50vh;
+  overflow-y: auto;
+}
+
+.palette-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 12px;
+  padding: 10px 12px;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+}
+
+.palette-item.is-active {
+  background: var(--color-bg-muted);
+}
+
+.palette-item__label {
+  font-size: 0.92rem;
+  color: var(--color-text);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.palette-item.is-active .palette-item__label {
+  color: var(--color-link);
+}
+
+.palette-item__hint {
+  flex: 0 0 auto;
+  font-size: 0.75rem;
+  color: var(--color-text-muted);
+}
+
+.palette-foot {
+  padding: 9px 14px;
+  font-size: 0.74rem;
+  color: var(--color-text-muted);
+  border-top: 1px solid var(--color-border);
 }

@@ -180,7 +180,25 @@ function renderSeriesCards() {
   if (cards.some(Boolean)) {
     mount.innerHTML = cards.join('');
     mount.hidden = false;
+    setupCardTilt();
   }
+}
+
+/* ---------- 合集卡片 3D 倾斜（鼠标跟随；触屏自动跳过） ---------- */
+function setupCardTilt() {
+  if (!window.matchMedia('(hover: hover)').matches) return;
+  document.querySelectorAll('.series-card').forEach((card) => {
+    if (card.dataset.tilt === 'on') return;
+    card.dataset.tilt = 'on';
+    card.addEventListener('mousemove', (e) => {
+      const rect = card.getBoundingClientRect();
+      const x = (e.clientX - rect.left) / rect.width - 0.5;
+      const y = (e.clientY - rect.top) / rect.height - 0.5;
+      card.style.transform =
+        `perspective(700px) rotateX(${(-y * 7).toFixed(2)}deg) rotateY(${(x * 7).toFixed(2)}deg) translateY(-2px)`;
+    });
+    card.addEventListener('mouseleave', () => { card.style.transform = ''; });
+  });
 }
 
 /* ---------- 首页小部件：现在时间 / 高考倒计时 ----------

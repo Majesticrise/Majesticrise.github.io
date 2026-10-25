@@ -35,6 +35,24 @@ export function escapeHtml(input) {
     .replace(/'/g, '&#39;');
 }
 
+/** 共享元素过渡：为文章标题生成跨页面配对的 view-transition-name */
+export function vtNameFor(postId) {
+  return 'post-' + String(postId).replace(new RegExp('[^A-Za-z0-9' + String.fromCharCode(92) + 'u4e00-' + String.fromCharCode(92) + 'u9fa5-]', 'g'), '');
+}
+
+/** 标签分类配色：给不同类别的内容标签一点克制的色彩区分 */
+const TAG_ACCENTS = {
+  'Minecraft': 'tag--tech',
+  '技术': 'tag--tech',
+  '教程': 'tag--tech',
+  '群聊存档': 'tag--chat',
+  '人物': 'tag--person'
+};
+
+export function tagAccentClass(tag) {
+  return TAG_ACCENTS[tag] || '';
+}
+
 /** 日期格式化：2026-08-19 -> 2026年8月19日 */
 export function formatDate(value) {
   if (!value) return '';
@@ -131,12 +149,12 @@ export async function findPostById(id) {
 export function postCardHtml(post) {
   const href = `${siteUrl('article.html')}?post=${encodeURIComponent(post.id)}`;
   const tags = post.tags
-    .map((t) => `<a class="tag" href="${siteUrl('tags.html')}#${encodeURIComponent(t)}">${escapeHtml(t)}</a>`)
+    .map((t) => `<a class="tag ${tagAccentClass(t)}" href="${siteUrl('tags.html')}#${encodeURIComponent(t)}">${escapeHtml(t)}</a>`)
     .join('');
 
   return `
     <article class="post-card">
-      <h2 class="post-card__title">
+      <h2 class="post-card__title" style="view-transition-name:${vtNameFor(post.id)}">
         <a href="${href}">${escapeHtml(post.title)}</a>
       </h2>
       <p class="post-card__meta">
@@ -211,8 +229,11 @@ function renderHeader() {
     <header class="site-header">
       <div class="container header-inner">
         <a class="brand" href="${siteUrl('index.html')}">
-          <span class="brand__title">${escapeHtml(config.siteTitle || '我的博客')}</span>
-          ${config.siteSubtitle ? `<span class="brand__subtitle">${escapeHtml(config.siteSubtitle)}</span>` : ''}
+          <img class="brand__avatar" src="${siteUrl('assets/img/avatar-icon.png')}" alt="站点头像">
+          <span class="brand__text">
+            <span class="brand__title">${escapeHtml(config.siteTitle || '我的博客')}</span>
+            ${config.siteSubtitle ? `<span class="brand__subtitle">${escapeHtml(config.siteSubtitle)}</span>` : ''}
+          </span>
         </a>
 
         <button class="nav-toggle" type="button" aria-label="切换导航" aria-expanded="false" aria-controls="site-nav">
@@ -251,8 +272,15 @@ function isDarkTheme() {
   return window.matchMedia('(prefers-color-scheme: dark)').matches;
 }
 
+const ICON_MOON = '<svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg>';
+const ICON_SUN = '<svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg>';
+
 function refreshThemeIcon(button) {
-  button.textContent = isDarkTheme() ? '☀️' : '🌙';
+  button.innerHTML = isDarkTheme() ? ICON_SUN : ICON_MOON;
+  button.classList.remove('theme-toggle--pop');
+  // 重新触发切换动画
+  void button.offsetWidth;
+  button.classList.add('theme-toggle--pop');
 }
 
 function setupThemeToggle(button) {
@@ -480,11 +508,13 @@ export function enableLightbox(container) {
   container.addEventListener('click', (event) => {
     const img = event.target.closest('img');
     if (!img) return;
-    openLightbox(img.currentSrc || img.src, img.alt);
+    openLightbox(img.currentSrc || img.src, img.alt, img);
   });
 }
 
-function openLightbox(src, alt) {
+let lightboxThumb = null; // 记录来源缩略图，关闭时做反向缩放过渡
+
+function openLightbox(src, alt, thumbEl) {
   let overlay = document.getElementById('lightbox-overlay');
   if (!overlay) {
     overlay = document.createElement('div');
@@ -502,11 +532,51 @@ function openLightbox(src, alt) {
   const big = overlay.querySelector('img');
   big.src = src;
   big.alt = alt || '';
-  overlay.classList.add('is-open');
+  lightboxThumb = thumbEl || null;
+
+  const applyOpen = () => {
+    overlay.classList.add('is-open');
+    if (big && lightboxThumb) {
+      big.style.viewTransitionName = 'lightbox-img';
+      lightboxThumb.style.viewTransitionName = '';
+    }
+  };
+
+  // 同文档视图过渡：图片从缩略图位置平滑放大（不支持的浏览器瞬间打开）
+  const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  if (document.startViewTransition && !reduceMotion && big && lightboxThumb) {
+    lightboxThumb.style.viewTransitionName = 'lightbox-img';
+    const vt = document.startViewTransition(applyOpen);
+    vt.finished.finally(() => { big.style.viewTransitionName = ''; });
+  } else {
+    applyOpen();
+  }
 }
 
 function closeLightbox() {
-  document.getElementById('lightbox-overlay')?.classList.remove('is-open');
+  const overlay = document.getElementById('lightbox-overlay');
+  if (!overlay) return;
+
+  const applyClose = () => {
+    overlay.classList.remove('is-open');
+    const big = overlay.querySelector('img');
+    if (big && lightboxThumb) {
+      big.style.viewTransitionName = '';
+      lightboxThumb.style.viewTransitionName = 'lightbox-img';
+    }
+  };
+
+  const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  if (document.startViewTransition && !reduceMotion && lightboxThumb && lightboxThumb.isConnected) {
+    const vt = document.startViewTransition(applyClose);
+    vt.finished.finally(() => {
+      lightboxThumb.style.viewTransitionName = '';
+      lightboxThumb = null;
+    });
+  } else {
+    applyClose();
+    lightboxThumb = null;
+  }
 }
 
 /* ---------- 9.5 代码块复制按钮 ---------- */
@@ -550,6 +620,28 @@ export function addCopyButtons(container) {
     pre.appendChild(btn);
   });
 }
+
+/* ---------- 9.8 Ctrl+K 命令面板（实现见 palette.js） ---------- */
+window.addEventListener('keydown', (event) => {
+  if ((event.ctrlKey || event.metaKey) && String(event.key).toLowerCase() === 'k') {
+    event.preventDefault();
+    import('./palette.js')
+      .then((mod) => mod.togglePalette())
+      .catch((err) => console.warn('[palette] 加载失败', err));
+  }
+});
+
+/* ---------- 9.9 标签页标题彩蛋：切走时卖个萌 ---------- */
+let titleBeforeHide = null;
+document.addEventListener('visibilitychange', () => {
+  if (document.hidden) {
+    titleBeforeHide = document.title;
+    document.title = '（´-`) 回来嘛…';
+  } else if (titleBeforeHide !== null) {
+    document.title = titleBeforeHide;
+    titleBeforeHide = null;
+  }
+});
 
 /* ---------- 10. 页面通用初始化 ---------- */
 /** 每个页面在 DOM 就绪后调用一次 */

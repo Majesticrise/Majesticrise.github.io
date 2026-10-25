@@ -3,7 +3,7 @@
  * 对应页面：archive.html
  * ============================================================ */
 
-import { initLayout, loadPosts, escapeHtml, siteUrl } from './components.js';
+import { initLayout, loadPosts, escapeHtml, siteUrl, tagAccentClass } from './components.js';
 
 initLayout();
 
@@ -36,7 +36,7 @@ function render(posts) {
     for (const post of items) {
       const href = `${siteUrl('article.html')}?post=${encodeURIComponent(post.id)}`;
       const tags = post.tags
-        .map((t) => `<a class="tag" href="${siteUrl('tags.html')}#${encodeURIComponent(t)}">${escapeHtml(t)}</a>`)
+        .map((t) => `<a class="tag ${tagAccentClass(t)}" href="${siteUrl('tags.html')}#${encodeURIComponent(t)}">${escapeHtml(t)}</a>`)
         .join('');
       html += `
           <li class="archive-item">
