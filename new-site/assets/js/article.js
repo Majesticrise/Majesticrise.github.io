@@ -335,7 +335,8 @@ function showError(message, detail = '') {
     fm.gate === true || String(fm.gate).toLowerCase() === 'true';
   if (gateLocked) {
     const gate = window.SITE_CONFIG?.entranceGate || {};
-    if (!requestGatePass()) {
+    const passed = await requestGatePass();
+    if (!passed) {
       if (gate.redirectUrl) window.location.href = gate.redirectUrl;
       showError('这篇文章已上锁', '回答正确才能阅读。');
       return;

@@ -11,6 +11,28 @@
     "url": "posts/2026-10-29-Wurst-vs-Meteor同功能实现对照.md"
   },
   {
+    "id": "2026-10-29-Alien-特色功能速览",
+    "title": "Alien Client 特色功能速览",
+    "date": "2026-10-29",
+    "tags": [
+      "Minecraft",
+      "技术"
+    ],
+    "summary": "Alien Client 特色功能速览：exploit / 攻城 / 旋转 / AntiCheat 与功能拆解。",
+    "url": "posts/2026-10-29-Alien-特色功能速览.md"
+  },
+  {
+    "id": "2026-10-29-Alien-源码分析报告",
+    "title": "Alien Client 源码分析报告",
+    "date": "2026-10-29",
+    "tags": [
+      "Minecraft",
+      "技术"
+    ],
+    "summary": "Alien Client 源码分析报告：反编译重建源码、Mixin 与 Manager 架构、exploit 与 AntiCheat 中枢。",
+    "url": "posts/2026-10-29-Alien-源码分析报告.md"
+  },
+  {
     "id": "2026-10-28-Meteor功能详解补充卷2",
     "title": "Meteor Client 功能详解·补充卷 2：网络通信 / Mixin 逐条全表 / 渲染与 HUD / util 包",
     "date": "2026-10-28",

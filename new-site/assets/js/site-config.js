@@ -80,6 +80,8 @@ window.SITE_CONFIG = {
    * enabled: 总开关。关闭后首页与加锁文章都不再弹问答。
    * homeEnabled: 是否在访问首页时弹问答（旧站彩蛋）。
    * 【在这里修改问答内容】question / answer / redirectUrl。
+   * 校验为包含式：输入内容中只要有一段连续字符与 answer 一致即可通过，
+   * 前后多输其他字符不影响（例如 answer 为 XiaoHui_ 时，xxXiaoHui_yy 也能通过）。
    * oncePerSession: true 时答对一次后本次浏览器会话不再询问。
    * 文章加锁：在文章 Front Matter 里加一行 `gate: true`，
    * 该文章被访问时同样会弹出这里的问答（见 article.js）。

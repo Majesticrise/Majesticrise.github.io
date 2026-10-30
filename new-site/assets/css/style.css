@@ -1491,6 +1491,13 @@ pre:hover .code-copy-btn,
   ::view-transition-new(root) {
     animation: vt-page-in 280ms ease both;
   }
+
+  /* 共享元素（如文章标题）的位移：稍慢一点并配顺滑缓动，
+     让"标题滑向左上角"的过程清晰可见 */
+  ::view-transition-group(*) {
+    animation-duration: 380ms;
+    animation-timing-function: cubic-bezier(0.22, 0.72, 0.2, 1);
+  }
 }
 
 /* 降级方案：不支持视图过渡的浏览器，页面内容载入时做一次轻微淡入 */
@@ -1625,4 +1632,75 @@ pre:hover .code-copy-btn,
   font-size: 0.74rem;
   color: var(--color-text-muted);
   border-top: 1px solid var(--color-border);
+}
+
+/* ---------------- 26. 进门问答弹窗（密码式输入） ---------------- */
+
+.gate-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 180;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+  background: rgba(0, 0, 0, 0.55);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 180ms ease;
+}
+
+.gate-overlay.is-open {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.gate-panel {
+  width: min(400px, 100%);
+  background: var(--color-bg);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  box-shadow: 0 16px 60px rgba(0, 0, 0, 0.45);
+  padding: 24px 22px 16px;
+  transform: translateY(-8px);
+  transition: transform 180ms ease;
+}
+
+.gate-overlay.is-open .gate-panel {
+  transform: none;
+}
+
+.gate-question {
+  margin: 0 0 14px;
+  font-weight: 600;
+  line-height: 1.6;
+}
+
+.gate-form {
+  display: flex;
+  gap: 10px;
+}
+
+.gate-input {
+  flex: 1;
+  min-width: 0;
+  padding: 10px 12px;
+  font-size: 0.95rem;
+  letter-spacing: 2px; /* 圆点之间留出间距，更像密码框 */
+  color: var(--color-text);
+  background: var(--color-bg-soft);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+}
+
+.gate-input:focus {
+  outline: none;
+  border-color: var(--color-link);
+}
+
+.gate-error {
+  min-height: 1.3em;
+  margin: 10px 0 0;
+  font-size: 0.85rem;
+  color: var(--color-danger);
 }

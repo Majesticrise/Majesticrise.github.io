@@ -33,6 +33,33 @@
           <div class="article-tags" id="article-tags"></div>
         </header>
 
+        <!--
+          同步预填标题/日期 + 设置共享元素过渡名（必须发生在首次绘制之前，
+          否则跨文档视图过渡的快照会拍到"加载中…"，标题动画就没了）。
+          数据来自 sessionStorage 缓存（首页等页面加载文章清单时写入）。
+        -->
+        <script>
+          (function () {
+            var id = new URLSearchParams(location.search).get('post');
+            if (!id) return;
+            var titleEl = document.getElementById('article-title');
+            var metaEl = document.getElementById('article-meta');
+            // 共享元素过渡名：与列表页标题配对（规则同 components.js 的 vtNameFor）
+            titleEl.style.viewTransitionName =
+              'post-' + String(id).replace(/[^A-Za-z0-9一-龥-]/g, '');
+            try {
+              var map = JSON.parse(sessionStorage.getItem('lea:post-titles') || '{}');
+              var hit = map[id];
+              if (hit) {
+                if (hit.t) titleEl.textContent = hit.t;
+                if (hit.d && metaEl) {
+                  metaEl.innerHTML = '<time datetime="' + hit.d + '">' + hit.d + '</time>';
+                }
+              }
+            } catch (e) { /* 缓存不可用时走正常异步加载 */ }
+          })();
+        </script>
+
         <!-- 目录（标题数量不足时自动隐藏） -->
         <nav class="article-toc" id="article-toc" aria-label="文章目录" hidden></nav>
 

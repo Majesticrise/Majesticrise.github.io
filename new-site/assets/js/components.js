@@ -94,6 +94,7 @@ export async function loadPosts() {
       const list = Array.isArray(data) ? data : (Array.isArray(data.posts) ? data.posts : []);
       if (list.length > 0) {
         postsCache = normalizePosts(list);
+        cachePostTitles(postsCache);
         return postsCache;
       }
     } catch (err) {
@@ -104,7 +105,21 @@ export async function loadPosts() {
 
   // 最底层兜底：硬编码一条示例，避免首页白屏
   postsCache = normalizePosts(BUILTIN_FALLBACK);
+  cachePostTitles(postsCache);
   return postsCache;
+}
+
+/**
+ * 把标题/日期缓存到 sessionStorage，供文章页的同步内联脚本在
+ * 首次绘制前预填标题（跨文档视图过渡的快照才会拍到真实标题，
+ * 而不是"加载中…"）。缓存失败（隐私模式等）不影响任何功能。
+ */
+function cachePostTitles(list) {
+  try {
+    const map = {};
+    list.forEach((p) => { map[p.id] = { t: p.title, d: p.date }; });
+    sessionStorage.setItem('lea:post-titles', JSON.stringify(map));
+  } catch { /* 忽略 */ }
 }
 
 const BUILTIN_FALLBACK = [
@@ -452,12 +467,70 @@ export function mountGiscus(postId) {
 
 /* ---------- 8. 进门问答（首页彩蛋 + 加锁文章，配置见 site-config.js） ---------- */
 /**
- * 弹出问答，返回是否通过。
- * 答对返回 true（oncePerSession 开启时记入 sessionStorage）；
- * 答错/取消返回 false；浏览器禁用弹窗时放行（返回 true，不困住访客）。
- * 调用方自行决定不通过时的行为（通常是跳转到 gate.redirectUrl）。
+ * 密码式弹窗：输入以圆点显示；校验为"包含式"——输入内容中只要存在一段
+ * 连续字符与答案一致即通过，前后夹带其他字符不影响。
+ * 返回 Promise<boolean>：答对 true；答错/关闭 false（是否跳转由调用方决定）。
  */
-export function requestGatePass() {
+function showGateDialog(gate, sessionKey) {
+  return new Promise((resolve) => {
+    let overlay = document.getElementById('gate-overlay');
+    if (!overlay) {
+      overlay = document.createElement('div');
+      overlay.id = 'gate-overlay';
+      overlay.className = 'gate-overlay';
+      overlay.innerHTML = `
+        <div class="gate-panel" role="dialog" aria-modal="true" aria-label="访问验证">
+          <p class="gate-question"></p>
+          <form class="gate-form">
+            <input class="gate-input" type="password" autocomplete="off" spellcheck="false" aria-label="答案">
+            <button class="btn btn--primary" type="submit">确认</button>
+          </form>
+          <p class="gate-error" role="status"></p>
+        </div>`;
+      document.body.appendChild(overlay);
+    }
+
+    const input = overlay.querySelector('.gate-input');
+    const errEl = overlay.querySelector('.gate-error');
+    const form = overlay.querySelector('.gate-form');
+    overlay.querySelector('.gate-question').textContent = gate.question || '请输入答案';
+    input.value = '';
+    errEl.textContent = '';
+    overlay.classList.add('is-open');
+
+    let settled = false;
+    const finish = (passed) => {
+      if (settled) return;
+      settled = true;
+      document.removeEventListener('keydown', onKey, true);
+      overlay.classList.remove('is-open');
+      resolve(passed);
+    };
+
+    const onKey = (e) => {
+      if (e.key === 'Escape') { e.preventDefault(); finish(false); }
+    };
+    document.addEventListener('keydown', onKey, true);
+
+    form.onsubmit = (e) => {
+      e.preventDefault();
+      const value = (input.value || '').replace(/\s/g, '');
+      if (gate.answer && value.includes(String(gate.answer))) {
+        if (gate.oncePerSession) {
+          try { sessionStorage.setItem(sessionKey, '1'); } catch { /* 忽略 */ }
+        }
+        finish(true);
+      } else {
+        errEl.textContent = '回答不对，正在送你去该去的地方…';
+        setTimeout(() => finish(false), 1200);
+      }
+    };
+
+    setTimeout(() => input.focus(), 60);
+  });
+}
+
+export async function requestGatePass() {
   const gate = config.entranceGate;
   if (!gate || !gate.enabled) return true;
 
@@ -468,38 +541,29 @@ export function requestGatePass() {
     } catch { /* 隐私模式下 sessionStorage 不可用，忽略 */ }
   }
 
-  let answer = null;
-  try {
-    answer = window.prompt(gate.question || '', '');
-  } catch {
-    return true; // 浏览器禁用了弹窗时不拦截访客
-  }
-
-  if (answer !== null && String(answer).trim() === String(gate.answer ?? '')) {
-    if (gate.oncePerSession) {
-      try { sessionStorage.setItem(sessionKey, '1'); } catch { /* 忽略 */ }
-    }
-    return true;
-  }
-  return false;
+  const passed = await showGateDialog(gate, sessionKey);
+  return passed;
 }
 
 /**
  * 首页进门问答（旧站彩蛋）：不通过则跳转到 redirectUrl。
  * 只在首页（index.html）调用；是否启用由 entranceGate.homeEnabled 控制。
  */
-export function applyEntranceGate() {
+export async function applyEntranceGate() {
   const gate = config.entranceGate;
   if (!gate || !gate.enabled || !gate.homeEnabled) return;
-  if (!requestGatePass() && gate.redirectUrl) {
+  const passed = await requestGatePass();
+  if (!passed && gate.redirectUrl) {
     window.location.href = gate.redirectUrl;
   }
 }
 
-/* ---------- 9. 图片灯箱 ---------- */
+/* ---------- 9. 图片灯箱（同文档视图过渡缩放） ---------- */
+let lightboxThumb = null; // 记录来源缩略图，关闭时做反向缩放过渡
+
 /**
  * 给容器内的图片开启点击放大（聊天截图、资源图等）。
- * 点击遮罩或按 Esc 关闭。用在文章正文和资源内容上。
+ * 支持视图过渡的浏览器里，图片会从缩略图位置平滑放大/缩回。
  */
 export function enableLightbox(container) {
   if (!container || container.dataset.lightbox === 'on') return;
@@ -511,8 +575,6 @@ export function enableLightbox(container) {
     openLightbox(img.currentSrc || img.src, img.alt, img);
   });
 }
-
-let lightboxThumb = null; // 记录来源缩略图，关闭时做反向缩放过渡
 
 function openLightbox(src, alt, thumbEl) {
   let overlay = document.getElementById('lightbox-overlay');
@@ -542,7 +604,6 @@ function openLightbox(src, alt, thumbEl) {
     }
   };
 
-  // 同文档视图过渡：图片从缩略图位置平滑放大（不支持的浏览器瞬间打开）
   const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   if (document.startViewTransition && !reduceMotion && big && lightboxThumb) {
     lightboxThumb.style.viewTransitionName = 'lightbox-img';
