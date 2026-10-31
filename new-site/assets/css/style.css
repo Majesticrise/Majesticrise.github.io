@@ -35,6 +35,19 @@
   --max-width: 880px;
   --header-height: 64px;
   --transition: 160ms ease;
+  --motion-ease: cubic-bezier(.22, 1, .36, 1);
+  --motion-fast: 180ms;
+  --motion-mid: 360ms;
+  --motion-slow: 700ms;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
 }
 
 /* 主题切换：深色变量集中在 :root[data-theme="dark"]（手动）
@@ -409,6 +422,16 @@ li + li { margin-top: 0.3em; }
 }
 .search-hint strong { color: var(--color-link); }
 
+.reveal {
+  opacity: 0;
+  transform: translateY(18px) scale(0.985);
+  transition: opacity var(--motion-slow) var(--motion-ease), transform var(--motion-slow) var(--motion-ease);
+}
+.reveal.is-visible {
+  opacity: 1;
+  transform: translateY(0) scale(1);
+}
+
 /* ---------------- 6. 文章卡片列表 ---------------- */
 .post-list {
   display: flex;
@@ -416,12 +439,70 @@ li + li { margin-top: 0.3em; }
   gap: 0;
 }
 
-.post-card {
-  padding: 26px 0;
-  border-bottom: 1px solid var(--color-border);
+.post-card,
+.series-card {
+  position: relative;
+  overflow: hidden;
+  padding: 26px 18px;
+  border: 1px solid var(--color-border);
+  border-radius: 16px;
+  background: linear-gradient(180deg, rgba(255,255,255,0.96), rgba(247,248,250,0.94));
+  box-shadow: var(--shadow-sm);
+  transition:
+    transform var(--motion-mid) var(--motion-ease),
+    box-shadow var(--motion-mid) var(--motion-ease),
+    border-color var(--motion-fast) ease,
+    opacity var(--motion-slow) ease;
+}
+.post-card::before,
+.series-card::before {
+  content: "";
+  position: absolute;
+  inset: -25%;
+  background: radial-gradient(circle at var(--x,50%) var(--y,50%), rgba(116,169,240,0.2), transparent 32%);
+  opacity: 0;
+  transition: opacity 220ms ease;
+  pointer-events: none;
 }
 .post-card:first-child { padding-top: 0; }
+
+/* 暗色模式：卡片底色用主题变量重绘（原浅色渐变写死会变成白卡片） */
+:root[data-theme="dark"] .post-card,
+:root[data-theme="dark"] .series-card {
+  background: linear-gradient(180deg, #262b33, #1f232a);
+  border-color: var(--color-border);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) .post-card,
+  :root:not([data-theme="light"]) .series-card {
+    background: linear-gradient(180deg, #262b33, #1f232a);
+    border-color: var(--color-border);
+  }
+}
 .post-card:last-child { border-bottom: 0; }
+.post-card:hover,
+.series-card:hover {
+  transform: translateY(-4px) rotateX(2deg) rotateY(-2deg);
+  box-shadow: 0 18px 40px rgba(28,111,214,0.12);
+  border-color: rgba(116,169,240,0.55);
+}
+.post-card:hover::before,
+.series-card:hover::before {
+  opacity: 1;
+}
+.post-card.is-visible,
+.series-card.is-visible {
+  opacity: 1;
+  transform: translateY(0) scale(1);
+}
+
+.post-card {
+  padding: 26px 18px;
+  border-bottom: 1px solid var(--color-border);
+  border-radius: 12px;
+  margin-bottom: 12px;
+}
 
 .post-card__title {
   margin: 0 0 6px;
@@ -596,10 +677,34 @@ li + li { margin-top: 0.3em; }
   border-radius: var(--radius-md);
   box-shadow: var(--shadow-sm);
   cursor: zoom-in;
+  transition: transform var(--motion-mid) var(--motion-ease), box-shadow var(--motion-mid) var(--motion-ease), opacity var(--motion-slow) ease;
+}
+.article-body img:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 16px 32px rgba(15, 23, 42, 0.12);
 }
 .article-body h2,
 .article-body h3 { scroll-margin-top: calc(var(--header-height) + 16px); }
 .article-body a { text-decoration: underline; text-underline-offset: 2px; }
+.article-body pre,
+.article-body blockquote,
+.article-body h2,
+.article-body h3 {
+  opacity: 0;
+  transform: translateY(14px);
+  transition: opacity var(--motion-slow) var(--motion-ease), transform var(--motion-slow) var(--motion-ease), box-shadow var(--motion-fast) ease;
+}
+.article-body pre.is-visible,
+.article-body blockquote.is-visible,
+.article-body h2.is-visible,
+.article-body h3.is-visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+.article-body pre:hover,
+.article-body blockquote:hover {
+  box-shadow: 0 12px 30px rgba(28,111,214,0.08);
+}
 
 /* 目录 */
 .article-toc {
@@ -1526,8 +1631,7 @@ pre:hover .code-copy-btn,
 /* 滚动渐入：纯 CSS scroll-driven animations（不支持的浏览器全部直接可见） */
 @supports (animation-timeline: view()) {
   @media (prefers-reduced-motion: no-preference) {
-    .article-body > *,
-    .post-card {
+    .article-body > * {
       animation: reveal-up linear both;
       animation-timeline: view();
       animation-range: entry 0% entry 45%;

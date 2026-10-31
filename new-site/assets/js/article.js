@@ -202,6 +202,38 @@ function wrapPostImages(container) {
 }
 
 /* ---------- 目录（TOC） ---------- */
+function setupArticleMotion() {
+  if (!bodyEl) return;
+
+  const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const targets = bodyEl.querySelectorAll('img, pre, blockquote, h2, h3');
+
+  if (reducedMotion) {
+    targets.forEach((el) => el.classList.add('is-visible'));
+    return;
+  }
+
+  if ('IntersectionObserver' in window) {
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach((entry) => {
+        if (!entry.isIntersecting) return;
+        entry.target.classList.add('is-visible');
+        observer.unobserve(entry.target);
+      });
+    }, { threshold: 0.12 });
+
+    targets.forEach((el) => {
+      el.classList.add('reveal');
+      observer.observe(el);
+    });
+    return;
+  }
+
+  targets.forEach((el) => {
+    el.classList.add('reveal', 'is-visible');
+  });
+}
+
 function buildToc(container) {
   if (!tocEl) return;
 
@@ -423,6 +455,7 @@ function showError(message, detail = '') {
     fixRelativeUrls(bodyEl);
     wrapPostImages(bodyEl); // 图片统一 figure 样式 + 图序说明
     fadeImagesOnLoad(bodyEl); // 图片加载完成后渐显
+    setupArticleMotion();
     buildToc(bodyEl);
     enableLightbox(bodyEl); // 点击图片放大查看（聊天截图刚需）
   }
@@ -446,6 +479,25 @@ function showError(message, detail = '') {
     window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', applyHljsTheme);
   } catch {
     console.warn('[highlight.js] 未加载，代码块保持无高亮');
+  }
+
+  // 文章内容的入场点亮：h2/h3/代码块/引用块初始为透明（见 style.css），
+  // 滚动进入视野时加 .is-visible 点亮；无 IntersectionObserver 时立即全部点亮
+  if (bodyEl) {
+    const revealables = bodyEl.querySelectorAll('pre, blockquote, h2, h3');
+    const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if (reducedMotion || !('IntersectionObserver' in window)) {
+      revealables.forEach((el) => el.classList.add('is-visible'));
+    } else {
+      const io = new IntersectionObserver((entries) => {
+        entries.forEach((entry) => {
+          if (!entry.isIntersecting) return;
+          entry.target.classList.add('is-visible');
+          io.unobserve(entry.target);
+        });
+      }, { rootMargin: '0px 0px -8% 0px' });
+      revealables.forEach((el) => io.observe(el));
+    }
   }
 
   if (bodyEl) {

@@ -156,7 +156,6 @@ const initialTag = params.get('tag') || '';
 function renderSeriesCards() {
   const mount = document.getElementById('series-cards');
   const series = config.series || [];
-  window.__dbg = { called: true, mount: !!mount, seriesLen: series.length, allLen: state.all.length, sampleId: state.all[0]?.id };
   if (!mount || !series.length) return;
 
   const cards = series.map((item) => {
@@ -198,6 +197,54 @@ function setupCardTilt() {
         `perspective(700px) rotateX(${(-y * 7).toFixed(2)}deg) rotateY(${(x * 7).toFixed(2)}deg) translateY(-2px)`;
     });
     card.addEventListener('mouseleave', () => { card.style.transform = ''; });
+  });
+}
+
+function initRevealAnimations() {
+  const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const targets = document.querySelectorAll('.post-card, .series-card, .home-widget');
+
+  if (reducedMotion) {
+    targets.forEach((el) => el.classList.add('is-visible'));
+    return;
+  }
+
+  if ('IntersectionObserver' in window) {
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach((entry) => {
+        if (!entry.isIntersecting) return;
+        entry.target.classList.add('is-visible');
+        observer.unobserve(entry.target);
+      });
+    }, { threshold: 0.12 });
+
+    targets.forEach((el) => {
+      el.classList.add('reveal');
+      observer.observe(el);
+    });
+    return;
+  }
+
+  targets.forEach((el) => {
+    el.classList.add('reveal', 'is-visible');
+  });
+}
+
+function bindCardMotion() {
+  const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  if (reducedMotion) return;
+
+  document.querySelectorAll('.post-card, .series-card').forEach((card) => {
+    if (card.dataset.motionBound === 'true') return;
+    card.dataset.motionBound = 'true';
+
+    card.addEventListener('pointermove', (event) => {
+      const rect = card.getBoundingClientRect();
+      const x = ((event.clientX - rect.left) / rect.width) * 100;
+      const y = ((event.clientY - rect.top) / rect.height) * 100;
+      card.style.setProperty('--x', `${x}%`);
+      card.style.setProperty('--y', `${y}%`);
+    });
   });
 }
 
@@ -272,6 +319,8 @@ function initHomeWidgets() {
 
   state.all = await loadPosts();
   renderSeriesCards();
+  bindCardMotion();
+  initRevealAnimations();
 
   if (initialTag) {
     state.all = state.all.filter((p) =>
@@ -285,4 +334,5 @@ function initHomeWidgets() {
 
   state.filtered = state.all.slice();
   renderList(true);
+  initRevealAnimations();
 })();
