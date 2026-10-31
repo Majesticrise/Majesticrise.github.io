@@ -559,10 +559,37 @@ export async function applyEntranceGate() {
 }
 
 /* ---------- 9. 图片灯箱（同文档视图过渡缩放） ---------- */
-let lightboxThumb = null; // 记录来源缩略图，关闭时做反向缩放过渡
+/* 灯箱运行状态：当前容器内全部图片 + 索引 */
+let lightboxState = null;
+
+/**
+ * 视图过渡运行器：startViewTransition 可能抛错或被浏览器中止
+ * （比如连续快速操作导致 InvalidStateError），此时浏览器不会执行
+ * DOM 更新回调——这里保证无论如何 updateFn 都会执行，绝不让
+ * 界面卡在中间状态。
+ */
+function runViewTransition(updateFn) {
+  const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  if (!document.startViewTransition || reduceMotion) {
+    updateFn();
+    return Promise.resolve();
+  }
+  let applied = false;
+  const wrapped = () => { applied = true; updateFn(); };
+  try {
+    const vt = document.startViewTransition(wrapped);
+    return Promise.all([vt.updateCallbackDone, vt.finished]).catch(() => {
+      if (!applied) updateFn(); // 过渡被中止且回调未执行：兜底直接更新
+    });
+  } catch {
+    if (!applied) updateFn();
+    return Promise.resolve();
+  }
+}
 
 /**
  * 给容器内的图片开启点击放大（聊天截图、资源图等）。
+ * 同容器多张图时支持左右翻页（箭头按钮 / 键盘方向键）。
  * 支持视图过渡的浏览器里，图片会从缩略图位置平滑放大/缩回。
  */
 export function enableLightbox(container) {
@@ -572,75 +599,127 @@ export function enableLightbox(container) {
   container.addEventListener('click', (event) => {
     const img = event.target.closest('img');
     if (!img) return;
-    openLightbox(img.currentSrc || img.src, img.alt, img);
+    const images = [...container.querySelectorAll('img')];
+    openLightboxAt(images, images.indexOf(img));
   });
 }
 
-function openLightbox(src, alt, thumbEl) {
+function buildLightboxOverlay() {
   let overlay = document.getElementById('lightbox-overlay');
-  if (!overlay) {
-    overlay = document.createElement('div');
-    overlay.id = 'lightbox-overlay';
-    overlay.className = 'lightbox-overlay';
-    overlay.setAttribute('role', 'dialog');
-    overlay.setAttribute('aria-label', '图片查看');
-    overlay.innerHTML = '<img alt="">';
-    overlay.addEventListener('click', closeLightbox);
-    document.addEventListener('keydown', (event) => {
-      if (event.key === 'Escape') closeLightbox();
-    });
-    document.body.appendChild(overlay);
-  }
-  const big = overlay.querySelector('img');
-  big.src = src;
-  big.alt = alt || '';
-  lightboxThumb = thumbEl || null;
+  if (overlay) return overlay;
 
-  const applyOpen = () => {
+  overlay = document.createElement('div');
+  overlay.id = 'lightbox-overlay';
+  overlay.className = 'lightbox-overlay';
+  overlay.setAttribute('role', 'dialog');
+  overlay.setAttribute('aria-label', '图片查看');
+  overlay.innerHTML = `
+    <button class="lightbox-nav lightbox-nav--prev" type="button" aria-label="上一张">‹</button>
+    <img alt="">
+    <button class="lightbox-nav lightbox-nav--next" type="button" aria-label="下一张">›</button>
+    <div class="lightbox-counter" aria-live="polite"></div>`;
+  overlay.addEventListener('click', (e) => {
+    if (e.target === overlay) closeLightbox();
+  });
+  document.addEventListener('keydown', (e) => {
+    if (!lightboxState) return;
+    if (e.key === 'Escape') closeLightbox();
+    else if (e.key === 'ArrowLeft') showLightboxImage(lightboxState.index - 1);
+    else if (e.key === 'ArrowRight') showLightboxImage(lightboxState.index + 1);
+  });
+  overlay.querySelector('.lightbox-nav--prev').addEventListener('click', () => {
+    showLightboxImage(lightboxState.index - 1);
+  });
+  overlay.querySelector('.lightbox-nav--next').addEventListener('click', () => {
+    showLightboxImage(lightboxState.index + 1);
+  });
+  document.body.appendChild(overlay);
+  return overlay;
+}
+
+function showLightboxImage(index) {
+  const images = lightboxState.images;
+  const total = images.length;
+  // 循环翻页
+  lightboxState.index = ((index % total) + total) % total;
+  const img = images[lightboxState.index];
+  const big = document.querySelector('#lightbox-overlay img');
+  big.src = img.currentSrc || img.src;
+  big.alt = img.alt || '';
+  const counter = document.querySelector('.lightbox-counter');
+  counter.textContent = (lightboxState.index + 1) + ' / ' + total;
+}
+
+function openLightboxAt(images, index) {
+  const overlay = buildLightboxOverlay();
+  lightboxState = { images, index };
+  const thumbEl = images[index] || null;
+
+  runViewTransition(() => {
+    showLightboxImage(index);
+    updateLightboxChrome();
     overlay.classList.add('is-open');
-    if (big && lightboxThumb) {
+    const big = overlay.querySelector('img');
+    if (big && thumbEl) {
       big.style.viewTransitionName = 'lightbox-img';
-      lightboxThumb.style.viewTransitionName = '';
+      thumbEl.style.viewTransitionName = '';
     }
-  };
+  }).finally(() => {
+    const big = overlay.querySelector('img');
+    if (big) big.style.viewTransitionName = '';
+  });
+}
 
-  const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-  if (document.startViewTransition && !reduceMotion && big && lightboxThumb) {
-    lightboxThumb.style.viewTransitionName = 'lightbox-img';
-    const vt = document.startViewTransition(applyOpen);
-    vt.finished.finally(() => { big.style.viewTransitionName = ''; });
-  } else {
-    applyOpen();
-  }
+function updateLightboxChrome() {
+  const overlay = document.getElementById('lightbox-overlay');
+  if (!overlay) return;
+  const multi = lightboxState.images.length > 1;
+  overlay.querySelector('.lightbox-nav--prev').hidden = !multi;
+  overlay.querySelector('.lightbox-nav--next').hidden = !multi;
+  overlay.querySelector('.lightbox-counter').hidden = !multi;
 }
 
 function closeLightbox() {
   const overlay = document.getElementById('lightbox-overlay');
-  if (!overlay) return;
+  if (!overlay || !lightboxState) return;
 
-  const applyClose = () => {
+  runViewTransition(() => {
     overlay.classList.remove('is-open');
     const big = overlay.querySelector('img');
-    if (big && lightboxThumb) {
+    const thumb = lightboxState.images[lightboxState.index];
+    if (big && thumb && thumb.isConnected) {
       big.style.viewTransitionName = '';
-      lightboxThumb.style.viewTransitionName = 'lightbox-img';
+      thumb.style.viewTransitionName = 'lightbox-img';
     }
-  };
-
-  const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-  if (document.startViewTransition && !reduceMotion && lightboxThumb && lightboxThumb.isConnected) {
-    const vt = document.startViewTransition(applyClose);
-    vt.finished.finally(() => {
-      lightboxThumb.style.viewTransitionName = '';
-      lightboxThumb = null;
+  }).finally(() => {
+    overlay.querySelectorAll('[style*="view-transition"]').forEach((el) => {
+      el.style.viewTransitionName = '';
     });
-  } else {
-    applyClose();
-    lightboxThumb = null;
-  }
+    lightboxState = null;
+  });
 }
 
-/* ---------- 9.5 代码块复制按钮 ---------- */
+/**
+ * 图片加载渐显：加载完成前挂 .img-enter（透明），onload 后移除。
+ * 只在 JS 可用时才挂类，脚本失效不会导致图片不可见。
+ */
+export function fadeImagesOnLoad(container) {
+  if (!container) return;
+  container.querySelectorAll('img').forEach((img) => {
+    if (img.dataset.fade === 'on') return;
+    img.dataset.fade = 'on';
+    if (img.complete && img.naturalWidth > 0) return; // 缓存已加载
+    img.classList.add('img-enter');
+    const done = () => img.classList.remove('img-enter');
+    if (img.complete) done();
+    else {
+      img.addEventListener('load', done, { once: true });
+      img.addEventListener('error', done, { once: true });
+    }
+  });
+}
+
+/* ---------- 9.5 代码块复制按钮 ---------- *//* ---------- 9.5 代码块复制按钮 ---------- */
 /**
  * 给容器内所有 <pre> 加"复制"按钮（文章正文与资源内容共用）。
  */

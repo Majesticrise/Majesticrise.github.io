@@ -10,7 +10,7 @@
 
 import {
   initLayout, loadPosts, findPostById, siteUrl, escapeHtml, formatDate, mountGiscus, enableLightbox,
-  requestGatePass, addCopyButtons, tagAccentClass, vtNameFor
+  requestGatePass, addCopyButtons, tagAccentClass, vtNameFor, fadeImagesOnLoad
 } from './components.js';
 
 initLayout();
@@ -422,6 +422,7 @@ function showError(message, detail = '') {
     bodyEl.innerHTML = html;
     fixRelativeUrls(bodyEl);
     wrapPostImages(bodyEl); // 图片统一 figure 样式 + 图序说明
+    fadeImagesOnLoad(bodyEl); // 图片加载完成后渐显
     buildToc(bodyEl);
     enableLightbox(bodyEl); // 点击图片放大查看（聊天截图刚需）
   }
@@ -450,6 +451,18 @@ function showError(message, detail = '') {
   if (bodyEl) {
     addCopyButtons(bodyEl);
     await renderMermaidBlocks(bodyEl);
+  }
+
+  /* --- 阅读进度条：现代浏览器走 CSS scroll()，其余用事件降级 --- */
+  const bar = document.querySelector('.read-progress');
+  if (bar && !CSS.supports('animation-timeline: scroll()')) {
+    const onScroll = () => {
+      const max = document.documentElement.scrollHeight - window.innerHeight;
+      const p = max > 0 ? Math.min(1, window.scrollY / max) : 0;
+      bar.style.transform = 'scaleX(' + p + ')';
+    };
+    window.addEventListener('scroll', onScroll, { passive: true });
+    onScroll();
   }
 
   /* --- 上一篇 / 下一篇 --- */

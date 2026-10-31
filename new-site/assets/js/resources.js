@@ -5,7 +5,7 @@
  * 【在这里添加取件码】请改 assets/data/resources.json，不要改这里。
  * ============================================================ */
 
-import { initLayout, siteUrl, escapeHtml, enableLightbox, addCopyButtons } from './components.js';
+import { initLayout, siteUrl, escapeHtml, enableLightbox, addCopyButtons, fadeImagesOnLoad } from './components.js';
 
 initLayout();
 
@@ -112,6 +112,7 @@ function showResult(html, title) {
     img.decoding = 'async';
   });
   enableLightbox(resultEl);
+  fadeImagesOnLoad(resultEl);
   addCopyButtons(resultEl);
 
   document.getElementById('reset-btn-inline')?.addEventListener('click', resetView);

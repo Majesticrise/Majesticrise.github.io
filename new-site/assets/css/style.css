@@ -1495,17 +1495,17 @@ pre:hover .code-copy-btn,
   /* 共享元素（如文章标题）的位移：更慢 + 强减速缓动曲线，
      起步快、收尾绵长，营造丝滑的"飘过去"手感 */
   ::view-transition-group(*) {
-    animation-duration: 560ms;
+    animation-duration: 700ms;
     animation-timing-function: cubic-bezier(0.16, 1, 0.3, 1);
   }
 
   /* 页面本身的淡出淡入也拉长一点，与共享元素同步 */
   ::view-transition-old(root) {
-    animation-duration: 260ms;
+    animation-duration: 320ms;
   }
 
   ::view-transition-new(root) {
-    animation-duration: 420ms;
+    animation-duration: 520ms;
   }
 }
 
@@ -1712,4 +1712,94 @@ pre:hover .code-copy-btn,
   margin: 10px 0 0;
   font-size: 0.85rem;
   color: var(--color-danger);
+}
+
+/* ---------------- 27. 阅读进度条 / 灯箱翻页 / 图片渐显 ---------------- */
+
+/* 阅读进度条：滚动驱动，宽度随滚动增长 */
+.read-progress {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 3px;
+  transform: scaleX(0);
+  transform-origin: 0 50%;
+  background: linear-gradient(90deg, var(--color-accent), #9a6fd0);
+  z-index: 120;
+  pointer-events: none;
+}
+
+@supports (animation-timeline: scroll()) {
+  @media (prefers-reduced-motion: no-preference) {
+    .read-progress {
+      animation: grow-progress linear both;
+      animation-timeline: scroll(root);
+    }
+  }
+}
+
+@keyframes grow-progress {
+  from { transform: scaleX(0); }
+  to { transform: scaleX(1); }
+}
+
+/* 灯箱翻页控件 */
+.lightbox-nav {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 46px;
+  height: 46px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 26px;
+  line-height: 1;
+  color: #ffffff;
+  background: rgba(255, 255, 255, 0.12);
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  border-radius: 50%;
+  cursor: pointer;
+  transition: background 150ms ease;
+}
+
+.lightbox-nav:hover {
+  background: rgba(255, 255, 255, 0.28);
+}
+
+.lightbox-nav--prev { left: 18px; }
+.lightbox-nav--next { right: 18px; }
+
+.lightbox-nav[hidden] { display: none; }
+
+.lightbox-counter {
+  position: absolute;
+  bottom: 22px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 0.85rem;
+  color: rgba(255, 255, 255, 0.85);
+  font-variant-numeric: tabular-nums;
+}
+
+.lightbox-counter[hidden] { display: none; }
+
+/* 灯箱大图淡入（翻页时不生硬） */
+.lightbox-overlay img {
+  transition: opacity 150ms ease;
+}
+
+.lightbox-overlay img.is-switching {
+  opacity: 0;
+}
+
+/* 图片加载渐显（JS 挂 .img-enter，加载完成移除） */
+.article-body img,
+.resource-card__body img {
+  transition: opacity 400ms ease;
+}
+
+.img-enter {
+  opacity: 0;
 }
