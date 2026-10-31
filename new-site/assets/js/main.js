@@ -44,6 +44,7 @@ function renderList(reset = false) {
   }
 
   state.shown += next.length;
+  bindCardMotion();
 
   // 分页按钮状态
   if (moreBtn) {
@@ -180,6 +181,7 @@ function renderSeriesCards() {
     mount.innerHTML = cards.join('');
     mount.hidden = false;
     setupCardTilt();
+    bindCardMotion();
   }
 }
 
@@ -288,6 +290,11 @@ function bindCardMotion() {
       const y = ((event.clientY - rect.top) / rect.height) * 100;
       card.style.setProperty('--x', `${x}%`);
       card.style.setProperty('--y', `${y}%`);
+    });
+
+    card.addEventListener('pointerleave', () => {
+      card.style.setProperty('--x', '50%');
+      card.style.setProperty('--y', '50%');
     });
   });
 }
