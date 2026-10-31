@@ -127,6 +127,17 @@ window.SITE_CONFIG = {
     }
   ],
 
+  /* ---------- 首页侧栏"网安日报"（CI 每日抓取的外部内容） ----------
+   * 数据由 GitHub Actions 构建时从 AI 城网安日报抓取生成
+   * （scripts/fetch-cyber-daily.js → assets/data/cyber-daily.json）。
+   * 抓取失败或数据为空时此板块自动隐藏。maxItems 控制显示条数。
+   */
+  cyberDaily: {
+    enabled: true,
+    dataUrl: 'assets/data/cyber-daily.json',
+    maxItems: 5
+  },
+
   /* ---------- 导航栏全局搜索（快速跳转；首页另有含正文的全文搜索） ---------- */
   globalSearch: true,
 

@@ -54,6 +54,9 @@
       <div class="home-layout">
         <!-- 左侧栏：合集入口（内容在 site-config.js 维护） -->
         <aside class="home-side">
+          <!-- 网安日报（CI 每日抓取生成，内容在 site-config.js 的 cyberDaily 配置） -->
+          <div class="cyber-daily" id="cyber-daily" hidden></div>
+
           <!-- 系列入口卡片由 main.js 依据 site-config.js 的 series 渲染 -->
           <div class="series-cards" id="series-cards" hidden></div>
         </aside>

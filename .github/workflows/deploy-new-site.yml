@@ -12,6 +12,8 @@
 name: Deploy new-site to GitHub Pages
 
 on:
+  schedule:
+    - cron: '0 2 * * *'   # 每天 UTC 2:00（北京 10:00）：抓取当日网安日报并重新部署
   push:
     branches:
       - master        # 当前默认分支
@@ -60,6 +62,11 @@ jobs:
       - name: Generate posts manifest
         working-directory: new-site
         run: node scripts/generate-posts-manifest.js
+
+      # 抓取当日网安日报生成 cyber-daily.json；网络失败时脚本自行降级（保留旧数据/空结构）
+      - name: Fetch cybersecurity daily
+        working-directory: new-site
+        run: node scripts/fetch-cyber-daily.js
 
       - name: Compute SITE_URL
         id: site
@@ -119,6 +126,7 @@ jobs:
 
     if: |
       (github.event_name == 'push' && (github.ref == 'refs/heads/master' || github.ref == 'refs/heads/main')) ||
+      (github.event_name == 'schedule') ||
       (github.event_name == 'workflow_dispatch' && inputs.publish == 'true')
 
     environment:

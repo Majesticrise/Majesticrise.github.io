@@ -183,6 +183,50 @@ function renderSeriesCards() {
   }
 }
 
+/* ---------- 网安日报（CI 抓取的外部内容，配置见 site-config.js 的 cyberDaily） ---------- */
+async function renderCyberDaily() {
+  const mount = document.getElementById('cyber-daily');
+  const cfg = config.cyberDaily || {};
+  if (!mount || cfg.enabled === false) return;
+
+  try {
+    const res = await fetch(siteUrl(cfg.dataUrl || 'assets/data/cyber-daily.json'), { cache: 'no-cache' });
+    if (!res.ok) throw new Error('HTTP ' + res.status);
+    const data = await res.json();
+    const items = (data.items || []).slice(0, cfg.maxItems || 5);
+    if (!items.length) { mount.hidden = true; return; }
+
+    const dateLabel = data.date ? data.date.slice(5).replace('-', '.') : '';
+    mount.innerHTML = `
+      <p class="cyber-card__heading">🔒 网安日报 <span class="cyber-card__date">${dateLabel}</span></p>
+      <ul class="cyber-card__list">
+        ${items.map((item) => `
+          <li><a href="${escapeHtml(item.url)}" target="_blank" rel="noopener noreferrer">${escapeHtml(item.title)}</a></li>`).join('')}
+      </ul>
+      <a class="cyber-card__more" href="${escapeHtml(data.source)}" target="_blank" rel="noopener noreferrer">查看完整日报 ↗</a>`;
+    mount.hidden = false;
+  } catch {
+    mount.hidden = true; // 数据缺失/格式错误时静默隐藏
+  }
+}
+
+/* ---------- 推荐站点外链卡片（配置见 site-config.js 的 featuredSites） ---------- */
+function renderSiteLinks() {
+  const mount = document.getElementById('site-links');
+  const sites = config.featuredSites || [];
+  if (!mount || !sites.length) return;
+
+  mount.innerHTML = `
+    <p class="site-links__heading">推荐站点</p>
+    ${sites.map((site) => `
+      <a class="site-link-card" href="${escapeHtml(site.url)}" target="_blank" rel="noopener noreferrer">
+        <span class="site-link-card__name">${escapeHtml(site.name)} <span class="site-link-card__arrow" aria-hidden="true">↗</span></span>
+        <span class="site-link-card__desc">${escapeHtml(site.desc)}</span>
+      </a>`).join('')}
+  `;
+  mount.hidden = false;
+}
+
 /* ---------- 合集卡片 3D 倾斜（鼠标跟随；触屏自动跳过） ---------- */
 function setupCardTilt() {
   if (!window.matchMedia('(hover: hover)').matches) return;
@@ -318,7 +362,9 @@ function initHomeWidgets() {
   initHomeWidgets();
 
   state.all = await loadPosts();
+  renderCyberDaily();
   renderSeriesCards();
+  renderSiteLinks();
   bindCardMotion();
   initRevealAnimations();
 

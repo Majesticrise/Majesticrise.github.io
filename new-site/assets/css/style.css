@@ -1907,3 +1907,114 @@ pre:hover .code-copy-btn,
 .img-enter {
   opacity: 0;
 }
+
+/* 推荐站点外链卡片 */
+.site-links__heading {
+  margin: 0 0 10px;
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--color-text-muted);
+}
+
+.site-link-card {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  padding: 12px 14px;
+  margin-bottom: 10px;
+  background: var(--color-bg-soft);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  text-decoration: none;
+  transition: border-color var(--motion-fast) ease, transform var(--motion-fast) ease;
+}
+
+.site-link-card:hover {
+  border-color: var(--color-link);
+  transform: translateY(-1px);
+}
+
+.site-link-card__name {
+  font-size: 0.92rem;
+  font-weight: 700;
+  color: var(--color-link);
+}
+
+.site-link-card__arrow {
+  font-size: 0.8em;
+  opacity: 0.7;
+}
+
+.site-link-card__desc {
+  font-size: 0.8rem;
+  line-height: 1.55;
+  color: var(--color-text-soft);
+}
+
+/* 首页侧栏"网安日报"卡片 */
+.cyber-card {
+  padding: 14px 16px;
+  background: var(--color-bg-soft);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+}
+
+.cyber-card__heading {
+  margin: 0 0 10px;
+  font-size: 0.9rem;
+  font-weight: 700;
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+}
+
+.cyber-card__date {
+  font-size: 0.75rem;
+  font-weight: 400;
+  color: var(--color-link);
+  font-variant-numeric: tabular-nums;
+}
+
+.cyber-card__list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.cyber-card__list li {
+  padding: 5px 0;
+  border-bottom: 1px dashed var(--color-border);
+}
+
+.cyber-card__list li:last-child {
+  border-bottom: 0;
+}
+
+.cyber-card__list a {
+  font-size: 0.82rem;
+  line-height: 1.55;
+  color: var(--color-text-soft);
+  text-decoration: none;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.cyber-card__list a:hover {
+  color: var(--color-link);
+}
+
+.cyber-card__more {
+  display: inline-block;
+  margin-top: 8px;
+  font-size: 0.78rem;
+  color: var(--color-link);
+  text-decoration: none;
+}
+
+.cyber-card__more:hover {
+  text-decoration: underline;
+}

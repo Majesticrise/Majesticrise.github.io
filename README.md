@@ -52,6 +52,11 @@ push 后 GitHub Actions 自动重新生成清单并部署。想本地立即看�
 **新增取件码**：只改 `new-site/assets/data/resources.json`，照抄一条条目改键名和
 `html` 字段。
 
+**网安日报板块**：首页侧栏的"网安日报"由 CI 每日（北京 10:00）自动从
+AI 城网安日报抓取生成（`scripts/fetch-cyber-daily.js` → `cyber-daily.json`），
+抓取失败时自动保留旧数据或隐藏板块，无需人工维护。条数上限等配置在
+`site-config.js` 的 `cyberDaily` 段。
+
 **给文章上锁**：在文章 Front Matter 里加一行 `gate: true`，该文章被访问时会
 先弹出密码式问答弹窗（问题/答案/跳转地址在 `site-config.js` 的 `entranceGate` 段）。
 校验为包含式：输入内容中有一段连续字符与答案一致即可通过，前后多输其他字符
