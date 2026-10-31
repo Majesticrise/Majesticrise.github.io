@@ -1492,11 +1492,20 @@ pre:hover .code-copy-btn,
     animation: vt-page-in 280ms ease both;
   }
 
-  /* 共享元素（如文章标题）的位移：稍慢一点并配顺滑缓动，
-     让"标题滑向左上角"的过程清晰可见 */
+  /* 共享元素（如文章标题）的位移：更慢 + 强减速缓动曲线，
+     起步快、收尾绵长，营造丝滑的"飘过去"手感 */
   ::view-transition-group(*) {
-    animation-duration: 380ms;
-    animation-timing-function: cubic-bezier(0.22, 0.72, 0.2, 1);
+    animation-duration: 560ms;
+    animation-timing-function: cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  /* 页面本身的淡出淡入也拉长一点，与共享元素同步 */
+  ::view-transition-old(root) {
+    animation-duration: 260ms;
+  }
+
+  ::view-transition-new(root) {
+    animation-duration: 420ms;
   }
 }
 
