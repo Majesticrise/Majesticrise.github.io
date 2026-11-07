@@ -127,6 +127,18 @@ window.SITE_CONFIG = {
     }
   ],
 
+  /* ---------- 首页侧栏"推荐站点"（外链卡片） ----------
+   * 【在这里添加推荐站点】照抄一条即可，name/desc/url。
+   * 外链一律新窗口打开。
+   */
+  featuredSites: [
+    {
+      name: '网安日报速递',
+      desc: 'AI城 · 每日精选全球网络安全动态（CVE / 事件 / 威胁情报）。',
+      url: 'https://unclecheng-li.github.io/cybersecurity-daily/'
+    }
+  ],
+
   /* ---------- 首页侧栏"网安日报"（CI 每日抓取的外部内容） ----------
    * 数据由 GitHub Actions 构建时从 AI 城网安日报抓取生成
    * （scripts/fetch-cyber-daily.js → assets/data/cyber-daily.json）。
